@@ -1,20 +1,20 @@
-def wmae_loss():
+import torch
+import torch.nn.functional as F
+
+
+def wmae_loss(c=5):
     def loss(y_true, y_pred):
-        ## Coefficient
-        c = 5
-        
-        ## Normalization
+        # Normalization
         y_true_norm = (255 - y_true) / 255
         y_pred_norm = (255 - y_pred) / 255
 
-        ## Delta
+        # Delta
         delta = y_true_norm - y_pred_norm
 
-        ## Weighted Absolute Error
-        greater = K.cast(K.greater(delta, 0),"float32")
-        less = K.cast(K.less(delta, 0),"float32")
-        w = K.l2_normalize(greater*y_true_norm,axis=-1) * c + less
-        loss = K.mean(K.abs(w*delta))
-        
-        return loss 
+        # Weighted Absolute Error
+        greater = (delta > 0).float()
+        less = (delta < 0).float()
+        w = F.normalize(greater * y_true_norm, p=2, dim=-1) * c + less
+        return torch.mean(torch.abs(w * delta))
+
     return loss
