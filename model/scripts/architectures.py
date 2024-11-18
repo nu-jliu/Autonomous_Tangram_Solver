@@ -6,15 +6,13 @@ from tensorflow.python.keras.layers import (
     Dropout,
     Conv2DTranspose,
     Concatenate,
-    # RandomNormal,
-    # Sampling,
+    BatchNormalization,
+    RandomNormal,
+    Sampling,
     Activation,
     Dense,
     MaxPooling2D,
     UpSampling2D,
-)
-from tensorflow.python.keras.layers.normalization.batch_normalization import (
-    BatchNormalization,
 )
 from tensorflow.python.keras.regularizers import l2
 from tensorflow.python.keras import Model
