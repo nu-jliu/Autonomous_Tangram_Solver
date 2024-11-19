@@ -76,15 +76,27 @@ if __name__ == "__main__":
         help="name of the output test file",
     )
     parser.add_argument(
-        "--model-filename", default="tangram.pth", help="Name of the model file"
+        "--model-filename",
+        default="tangram",
+        help="Name of the model file",
+    )
+    parser.add_argument("--lamb", action="store_true", help="Use lambda to run it")
+    parser.add_argument(
+        "--load",
+        action="store_true",
+        help="Load the pre-trained model",
     )
 
     args = parser.parse_args()
 
     print(args)
     num_epochs = int(args.num_epoch)
-    outou_filename = args.output_filename
-    model_filename = args.model_filename
+    use_lamdba = args.lamb
+    output_filename = os.path.join(TEST_DIR, args.output_filename)
+    model_filename = os.path.join(MODEL_DIR, f"{args.model_filename}.pth")
+    load = args.load
+
+    batch_size = 128 if use_lamdba else 32
 
     # Transform: Resize and Normalize Images
     transform = transforms.Compose(
@@ -98,17 +110,17 @@ if __name__ == "__main__":
     input_dir = os.path.join(DATASET_DIR, "input_cae")
     target_dir = os.path.join(DATASET_DIR, "output_cae")
     dataset = BinaryImageDataset(input_dir, target_dir, transform=transform)
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     model = CAE(input_channels=1)  # For RGB images
+    if load:
+        model.load_state_dict(torch.load(model_filename))
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)  # Move model to GPU if available
 
     criterion = wmae_loss(c=50)  # Weighted Mean Absolute Error
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-
-    # num_epochs = 100
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     image_path = os.path.join(DATASET_DIR, "input_test", "23.png")
     input_image = Image.open(image_path).convert("L")  # Convert to grayscale
@@ -139,7 +151,7 @@ if __name__ == "__main__":
                 outputs = model.forward(inputs)
                 # outputs = outputs.squeeze(1)  # Remove channel dimension
 
-                loss = criterion(outputs, targets)
+                loss = criterion(targets, outputs)
 
                 # Backward Pass and Optimization
                 optimizer.zero_grad()
@@ -159,7 +171,7 @@ if __name__ == "__main__":
                 output_image = output.squeeze(0).cpu()  # Remove batch dimension
                 output_image = (output_image > 0.5).float()
 
-                save_image(output_image, outou_filename)
+                save_image(output_image, output_filename)
 
                 # if (i + 1) % 10 == 0:
                 #     print(f"Batch [{i+1}/{len(dataloader)}], Loss: {loss.item():.4f}")
@@ -182,4 +194,4 @@ if __name__ == "__main__":
     )
 
     plt.plot(np.arange(0, num_epochs, 1), losses)
-    plt.savefig("train_loss.png")
+    plt.savefig(os.path.join(TEST_DIR, "train_loss.png"))
