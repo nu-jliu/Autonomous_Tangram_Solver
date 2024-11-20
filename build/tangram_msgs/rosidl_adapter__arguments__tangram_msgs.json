@@ -1,0 +1,7 @@
+{
+  "package_name": "tangram_msgs",
+  "non_idl_tuples": [
+    "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/tangram_msgs:msg/TangramPose.msg",
+    "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/tangram_msgs:msg/TangramPoses.msg"
+  ]
+}

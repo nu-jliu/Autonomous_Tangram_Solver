@@ -1,0 +1,1 @@
+ament_cmake_symlink_install_targets("TARGET_FILES" "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_detection/tangram_detection" "TARGETS" "tangram_detection" "DESTINATION" "lib/tangram_detection")

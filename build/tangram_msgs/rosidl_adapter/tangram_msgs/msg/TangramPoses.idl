@@ -1,0 +1,13 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from tangram_msgs/msg/TangramPoses.msg
+// generated code does not contain a copyright notice
+
+#include "tangram_msgs/msg/TangramPose.idl"
+
+module tangram_msgs {
+  module msg {
+    struct TangramPoses {
+      sequence<tangram_msgs::msg::TangramPose> poses;
+    };
+  };
+};

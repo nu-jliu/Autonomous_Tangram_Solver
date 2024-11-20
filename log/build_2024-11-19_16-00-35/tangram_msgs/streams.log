@@ -1,0 +1,234 @@
+[0.034s] Invoking command in '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_xs_modules:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_common_modules:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_teleop:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_example:/opt/ros/iron /usr/bin/cmake /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/tangram_msgs -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs
+[0.111s] -- The C compiler identification is GNU 11.4.0
+[0.191s] -- The CXX compiler identification is GNU 11.4.0
+[0.201s] -- Detecting C compiler ABI info
+[0.307s] -- Detecting C compiler ABI info - done
+[0.320s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.320s] -- Detecting C compile features
+[0.321s] -- Detecting C compile features - done
+[0.327s] -- Detecting CXX compiler ABI info
+[0.465s] -- Detecting CXX compiler ABI info - done
+[0.479s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.480s] -- Detecting CXX compile features
+[0.480s] -- Detecting CXX compile features - done
+[0.490s] -- Found ament_cmake: 2.0.6 (/opt/ros/iron/share/ament_cmake/cmake)
+[1.144s] -- Found Python3: /usr/bin/python3.10 (found version "3.10.12") found components: Interpreter 
+[1.246s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.310s] -- Found rosidl_default_generators: 1.5.0 (/opt/ros/iron/share/rosidl_default_generators/cmake)
+[1.332s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.452s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.544s] -- Found rosidl_adapter: 4.0.1 (/opt/ros/iron/share/rosidl_adapter/cmake)
+[1.557s] -- Found std_msgs: 5.0.1 (/opt/ros/iron/share/std_msgs/cmake)
+[1.678s] -- Found geometry_msgs: 5.0.1 (/opt/ros/iron/share/geometry_msgs/cmake)
+[2.366s] -- Found ament_cmake_ros: 0.11.2 (/opt/ros/iron/share/ament_cmake_ros/cmake)
+[2.806s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[3.375s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[3.416s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") 
+[3.422s] -- Found python_cmake_module: 0.10.2 (/opt/ros/iron/share/python_cmake_module/cmake)
+[3.468s] -- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") 
+[3.468s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[3.468s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[3.468s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[3.503s] -- Found PythonExtra: .so  
+[3.635s] -- Found ament_lint_auto: 0.14.4 (/opt/ros/iron/share/ament_lint_auto/cmake)
+[3.696s] -- Added test 'lint_cmake' to check CMake code style
+[3.699s] -- Added test 'xmllint' to check XML markup files
+[3.706s] -- Configuring done
+[3.759s] -- Generating done
+[3.763s] -- Build files have been written to: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs
+[3.783s] Invoked command in '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_xs_modules:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_common_modules:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_teleop:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_example:/opt/ros/iron /usr/bin/cmake /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/tangram_msgs -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs
+[3.784s] Invoking command in '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_xs_modules:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_common_modules:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_teleop:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_example:/opt/ros/iron /usr/bin/cmake --build /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs -- -j32 -l32
+[3.858s] [  2%] [34m[1mGenerating type hashes for ROS interfaces[0m
+[3.872s] [  2%] Built target ament_cmake_python_symlink_tangram_msgs
+[4.243s] [  2%] Built target tangram_msgs__rosidl_generator_type_description
+[4.265s] [  4%] [34m[1mGenerating C code for ROS interfaces[0m
+[4.289s] [  6%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[4.319s] running egg_info
+[4.356s] creating tangram_msgs.egg-info
+[4.357s] writing tangram_msgs.egg-info/PKG-INFO
+[4.357s] writing dependency_links to tangram_msgs.egg-info/dependency_links.txt
+[4.358s] writing top-level names to tangram_msgs.egg-info/top_level.txt
+[4.358s] writing manifest file 'tangram_msgs.egg-info/SOURCES.txt'
+[4.447s] reading manifest file 'tangram_msgs.egg-info/SOURCES.txt'
+[4.448s] writing manifest file 'tangram_msgs.egg-info/SOURCES.txt'
+[4.486s] [  6%] Built target ament_cmake_python_build_tangram_msgs_egg
+[4.793s] [  6%] Built target tangram_msgs__cpp
+[4.874s] [  9%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_c.dir/rosidl_generator_c/tangram_msgs/msg/detail/tangram_pose__description.c.o[0m
+[4.875s] [ 11%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_c.dir/rosidl_generator_c/tangram_msgs/msg/detail/tangram_pose__functions.c.o[0m
+[4.875s] [ 13%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_c.dir/rosidl_generator_c/tangram_msgs/msg/detail/tangram_pose__type_support.c.o[0m
+[4.875s] [ 15%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_c.dir/rosidl_generator_c/tangram_msgs/msg/detail/tangram_poses__description.c.o[0m
+[4.876s] [ 20%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_c.dir/rosidl_generator_c/tangram_msgs/msg/detail/tangram_poses__functions.c.o[0m
+[4.876s] [ 20%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_c.dir/rosidl_generator_c/tangram_msgs/msg/detail/tangram_poses__type_support.c.o[0m
+[4.964s] [ 22%] [32m[1mLinking C shared library libtangram_msgs__rosidl_generator_c.so[0m
+[5.024s] [ 22%] Built target tangram_msgs__rosidl_generator_c
+[5.043s] [ 25%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[5.044s] [ 31%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[5.044s] [ 31%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[5.044s] [ 31%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[5.044s] [ 34%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[5.045s] [ 36%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[5.403s] [ 38%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/tangram_msgs/msg/tangram_poses__type_support.cpp.o[0m
+[5.407s] [ 40%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/tangram_msgs/msg/tangram_pose__type_support.cpp.o[0m
+[5.434s] [ 45%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/tangram_msgs/msg/detail/tangram_pose__type_support.c.o[0m
+[5.434s] [ 45%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/tangram_msgs/msg/detail/tangram_poses__type_support.c.o[0m
+[5.487s] [ 47%] [32m[1mLinking CXX shared library libtangram_msgs__rosidl_typesupport_c.so[0m
+[5.505s] [ 50%] [32m[1mLinking C shared library libtangram_msgs__rosidl_typesupport_introspection_c.so[0m
+[5.554s] [ 52%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/tangram_msgs/msg/tangram_pose__type_support.cpp.o[0m
+[5.559s] [ 54%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/tangram_msgs/msg/tangram_poses__type_support.cpp.o[0m
+[5.568s] [ 54%] Built target tangram_msgs__rosidl_typesupport_introspection_c
+[5.571s] [ 54%] Built target tangram_msgs__rosidl_typesupport_c
+[5.593s] [ 56%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/tangram_msgs/msg/detail/tangram_pose__type_support.cpp.o[0m
+[5.593s] [ 59%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/tangram_msgs/msg/detail/tangram_poses__type_support.cpp.o[0m
+[5.613s] [ 63%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/tangram_msgs/msg/detail/tangram_pose__type_support_c.cpp.o[0m
+[5.614s] [ 63%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/tangram_msgs/msg/detail/tangram_poses__type_support_c.cpp.o[0m
+[5.634s] [ 65%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/tangram_msgs/msg/detail/dds_fastrtps/tangram_pose__type_support.cpp.o[0m
+[5.634s] [ 68%] [32mBuilding CXX object CMakeFiles/tangram_msgs__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/tangram_msgs/msg/detail/dds_fastrtps/tangram_poses__type_support.cpp.o[0m
+[6.052s] [ 70%] [32m[1mLinking CXX shared library libtangram_msgs__rosidl_typesupport_cpp.so[0m
+[6.138s] [ 70%] Built target tangram_msgs__rosidl_typesupport_cpp
+[6.266s] [ 72%] [32m[1mLinking CXX shared library libtangram_msgs__rosidl_typesupport_fastrtps_c.so[0m
+[6.365s] [ 75%] [32m[1mLinking CXX shared library libtangram_msgs__rosidl_typesupport_introspection_cpp.so[0m
+[6.379s] [ 75%] Built target tangram_msgs__rosidl_typesupport_fastrtps_c
+[6.479s] [ 75%] Built target tangram_msgs__rosidl_typesupport_introspection_cpp
+[6.534s] [ 77%] [32m[1mLinking CXX shared library libtangram_msgs__rosidl_typesupport_fastrtps_cpp.so[0m
+[6.634s] [ 77%] Built target tangram_msgs__rosidl_typesupport_fastrtps_cpp
+[6.668s] [ 77%] Built target tangram_msgs
+[6.703s] [ 79%] [34m[1mGenerating Python code for ROS interfaces[0m
+[7.270s] [ 79%] Built target tangram_msgs__py
+[7.303s] [ 84%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_py.dir/rosidl_generator_py/tangram_msgs/msg/_tangram_pose_s.c.o[0m
+[7.304s] [ 84%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_generator_py.dir/rosidl_generator_py/tangram_msgs/msg/_tangram_poses_s.c.o[0m
+[7.453s] [ 86%] [32m[1mLinking C shared library rosidl_generator_py/tangram_msgs/libtangram_msgs__rosidl_generator_py.so[0m
+[7.514s] [ 86%] Built target tangram_msgs__rosidl_generator_py
+[7.550s] [ 93%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/tangram_msgs/_tangram_msgs_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[7.550s] [ 93%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/tangram_msgs/_tangram_msgs_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[7.550s] [ 93%] [32mBuilding C object CMakeFiles/tangram_msgs__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/tangram_msgs/_tangram_msgs_s.ep.rosidl_typesupport_c.c.o[0m
+[7.697s] [100%] [32m[1mLinking C shared library rosidl_generator_py/tangram_msgs/tangram_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so[0m
+[7.698s] [100%] [32m[1mLinking C shared library rosidl_generator_py/tangram_msgs/tangram_msgs_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so[0m
+[7.698s] [100%] [32m[1mLinking C shared library rosidl_generator_py/tangram_msgs/tangram_msgs_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so[0m
+[7.765s] [100%] Built target tangram_msgs__rosidl_typesupport_c__pyext
+[7.765s] [100%] Built target tangram_msgs__rosidl_typesupport_introspection_c__pyext
+[7.765s] [100%] Built target tangram_msgs__rosidl_typesupport_fastrtps_c__pyext
+[7.785s] Invoked command in '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_xs_modules:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_common_modules:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_teleop:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_example:/opt/ros/iron /usr/bin/cmake --build /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs -- -j32 -l32
+[7.927s] Invoking command in '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_xs_modules:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_common_modules:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_teleop:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_example:/opt/ros/iron /usr/bin/cmake --install /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs
+[7.940s] -- Install configuration: ""
+[7.941s] -- Execute custom install script
+[7.941s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/ament_index/resource_index/rosidl_interfaces/tangram_msgs
+[7.955s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/msg/TangramPose.json
+[7.967s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/msg/TangramPoses.json
+[7.980s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__functions.h
+[7.994s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__struct.h
+[8.006s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__type_support.h
+[8.019s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__functions.h
+[8.033s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__struct.h
+[8.051s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__type_support.h
+[8.073s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/rosidl_generator_c__visibility_control.h
+[8.095s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/tangram_pose.h
+[8.114s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/tangram_poses.h
+[8.130s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/library_path.sh
+[8.146s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/library_path.dsv
+[8.160s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__rosidl_typesupport_fastrtps_c.h
+[8.173s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__rosidl_typesupport_fastrtps_c.h
+[8.188s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[8.201s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__rosidl_typesupport_introspection_c.h
+[8.213s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__rosidl_typesupport_introspection_c.h
+[8.224s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[8.237s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__builder.hpp
+[8.250s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__struct.hpp
+[8.262s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__traits.hpp
+[8.274s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__builder.hpp
+[8.286s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__struct.hpp
+[8.299s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__traits.hpp
+[8.312s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/tangram_pose.hpp
+[8.324s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/tangram_poses.hpp
+[8.336s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__rosidl_typesupport_fastrtps_cpp.hpp
+[8.348s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__rosidl_typesupport_fastrtps_cpp.hpp
+[8.362s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[8.375s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_pose__rosidl_typesupport_introspection_cpp.hpp
+[8.387s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/include/tangram_msgs/tangram_msgs/msg/detail/tangram_poses__rosidl_typesupport_introspection_cpp.hpp
+[8.398s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/pythonpath.sh
+[8.410s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/pythonpath.dsv
+[8.424s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs-0.0.1-py3.10.egg-info/PKG-INFO
+[8.437s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs-0.0.1-py3.10.egg-info/SOURCES.txt
+[8.448s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs-0.0.1-py3.10.egg-info/dependency_links.txt
+[8.462s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs-0.0.1-py3.10.egg-info/top_level.txt
+[8.479s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/__init__.py
+[8.493s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/_tangram_msgs_s.ep.rosidl_typesupport_c.c
+[8.507s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/_tangram_msgs_s.ep.rosidl_typesupport_fastrtps_c.c
+[8.521s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/_tangram_msgs_s.ep.rosidl_typesupport_introspection_c.c
+[8.533s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/libtangram_msgs__rosidl_generator_py.so
+[8.545s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/__init__.py
+[8.558s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/_tangram_pose.py
+[8.570s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/_tangram_pose_s.c
+[8.582s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/_tangram_poses.py
+[8.593s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/_tangram_poses_s.c
+[8.605s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/tangram_msgs_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[8.619s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/tangram_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[8.634s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/tangram_msgs_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[8.649s] -- Up-to-date symlink: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/tangram_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[8.649s] -- Up-to-date symlink: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/tangram_msgs_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[8.650s] -- Up-to-date symlink: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/tangram_msgs_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[8.650s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/msg/TangramPose.idl
+[8.666s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/msg/TangramPoses.idl
+[8.682s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/msg/TangramPose.msg
+[8.698s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/msg/TangramPoses.msg
+[8.714s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/ament_index/resource_index/package_run_dependencies/tangram_msgs
+[8.729s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/ament_index/resource_index/parent_prefix_path/tangram_msgs
+[8.745s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/ament_prefix_path.sh
+[8.759s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/ament_prefix_path.dsv
+[8.771s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/path.sh
+[8.784s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/environment/path.dsv
+[8.795s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/local_setup.bash
+[8.807s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/local_setup.sh
+[8.819s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/local_setup.zsh
+[8.832s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/local_setup.dsv
+[8.844s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/package.dsv
+[8.856s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/ament_index/resource_index/packages/tangram_msgs
+[8.868s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/rosidl_cmake-extras.cmake
+[8.882s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/ament_cmake_export_dependencies-extras.cmake
+[8.893s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/ament_cmake_export_include_directories-extras.cmake
+[8.904s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/ament_cmake_export_libraries-extras.cmake
+[8.917s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/ament_cmake_export_targets-extras.cmake
+[8.931s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[8.946s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[8.963s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgsConfig.cmake
+[8.978s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgsConfig-version.cmake
+[8.993s] -- Symlinking: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/package.xml
+[9.007s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_generator_c.so
+[9.008s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_generator_c.so" to ""
+[9.008s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_fastrtps_c.so
+[9.008s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_fastrtps_c.so" to ""
+[9.009s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_introspection_c.so
+[9.009s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_introspection_c.so" to ""
+[9.009s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_c.so
+[9.010s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_c.so" to ""
+[9.010s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_fastrtps_cpp.so
+[9.011s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_fastrtps_cpp.so" to ""
+[9.011s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_introspection_cpp.so
+[9.012s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_introspection_cpp.so" to ""
+[9.012s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_cpp.so
+[9.012s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_typesupport_cpp.so" to ""
+[9.068s] Listing '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs'...
+[9.068s] Compiling '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/__init__.py'...
+[9.069s] Listing '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg'...
+[9.069s] Compiling '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/__init__.py'...
+[9.069s] Compiling '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/_tangram_pose.py'...
+[9.069s] Compiling '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/python3.10/site-packages/tangram_msgs/msg/_tangram_poses.py'...
+[9.078s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_generator_py.so
+[9.079s] -- Set runtime path of "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/lib/libtangram_msgs__rosidl_generator_py.so" to ""
+[9.079s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_generator_cExport.cmake
+[9.079s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_generator_cExport-noconfig.cmake
+[9.080s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_typesupport_fastrtps_cExport.cmake
+[9.080s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[9.080s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_introspection_cExport.cmake
+[9.080s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[9.081s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_cExport.cmake
+[9.082s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_cExport-noconfig.cmake
+[9.082s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_generator_cppExport.cmake
+[9.082s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_typesupport_fastrtps_cppExport.cmake
+[9.082s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[9.083s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_introspection_cppExport.cmake
+[9.083s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[9.083s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_cppExport.cmake
+[9.083s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/tangram_msgs__rosidl_typesupport_cppExport-noconfig.cmake
+[9.083s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_generator_pyExport.cmake
+[9.083s] -- Installing: /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/install/tangram_msgs/share/tangram_msgs/cmake/export_tangram_msgs__rosidl_generator_pyExport-noconfig.cmake
+[9.089s] Invoked command in '/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_xs_modules:/home/jingkun/ws/ros_ws/iron/interbotix/install/interbotix_common_modules:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_teleop:/home/jingkun/ws/ros_ws/iron/turtlebot3/install/turtlebot3_example:/opt/ros/iron /usr/bin/cmake --install /home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs

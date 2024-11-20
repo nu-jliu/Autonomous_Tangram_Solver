@@ -1,0 +1,4 @@
+source;share/tangram_detection/local_setup.bash
+source;share/tangram_detection/local_setup.dsv
+source;share/tangram_detection/local_setup.sh
+source;share/tangram_detection/local_setup.zsh

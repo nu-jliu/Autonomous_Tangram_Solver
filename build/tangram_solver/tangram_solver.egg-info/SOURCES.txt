@@ -1,0 +1,11 @@
+package.xml
+setup.cfg
+setup.py
+resource/tangram_solver
+tangram_solver/__init__.py
+tangram_solver.egg-info/PKG-INFO
+tangram_solver.egg-info/SOURCES.txt
+tangram_solver.egg-info/dependency_links.txt
+tangram_solver.egg-info/requires.txt
+tangram_solver.egg-info/top_level.txt
+tangram_solver.egg-info/zip-safe

@@ -1,0 +1,9 @@
+source;share/tangram_solver/hook/pythonpath.ps1
+source;share/tangram_solver/hook/pythonpath.dsv
+source;share/tangram_solver/hook/pythonpath.sh
+source;share/tangram_solver/hook/ament_prefix_path.ps1
+source;share/tangram_solver/hook/ament_prefix_path.dsv
+source;share/tangram_solver/hook/ament_prefix_path.sh
+source;../../build/tangram_solver/share/tangram_solver/hook/pythonpath_develop.ps1
+source;../../build/tangram_solver/share/tangram_solver/hook/pythonpath_develop.dsv
+source;../../build/tangram_solver/share/tangram_solver/hook/pythonpath_develop.sh
