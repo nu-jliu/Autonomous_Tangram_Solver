@@ -16,6 +16,7 @@ from wmae import wmae_loss
 import matplotlib.pyplot as plt
 import argparse
 import copy
+import pandas as pd
 
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.join(FILE_DIR, "..")
@@ -72,12 +73,12 @@ if __name__ == "__main__":
     parser.add_argument("--num-epoch", default=5000, help="Number of epochs")
     parser.add_argument(
         "--output-filename",
-        default="output_test.jpg",
+        default="output_test_cae.jpg",
         help="name of the output test file",
     )
     parser.add_argument(
         "--model-filename",
-        default="tangram",
+        default="tangram_cae",
         help="Name of the model file",
     )
     parser.add_argument("--lamb", action="store_true", help="Use lambda to run it")
@@ -85,6 +86,11 @@ if __name__ == "__main__":
         "--load",
         action="store_true",
         help="Load the pre-trained model",
+    )
+    parser.add_argument(
+        "--loss-filename",
+        default="epoch_loss_cae.csv",
+        help="File name of the loss csv data for each epoch",
     )
 
     args = parser.parse_args()
@@ -94,6 +100,7 @@ if __name__ == "__main__":
     use_lamdba = args.lamb
     output_filename = os.path.join(TEST_DIR, args.output_filename)
     model_filename = os.path.join(MODEL_DIR, f"{args.model_filename}.pth")
+    loss_filename = os.path.join(TEST_DIR, args.loss_filename)
     load = args.load
 
     batch_size = 128 if use_lamdba else 32
@@ -130,6 +137,11 @@ if __name__ == "__main__":
 
     # num_epochs = 100
     losses = []
+    try:
+        df = pd.read_csv(loss_filename)
+        losses = df["loss"].to_list()
+    except FileNotFoundError:
+        print("File not found")
 
     for epoch in range(num_epochs):
         model.train()
@@ -141,6 +153,7 @@ if __name__ == "__main__":
         with tqdm(
             dataloader,
             unit="batch",
+            colour="green",
         ) as tepoch:
             tepoch.set_description(f"Epoch {epoch+1}/{num_epochs}")
 
@@ -163,15 +176,27 @@ if __name__ == "__main__":
 
                 # Perform inference
                 model_ev = copy.deepcopy(model)
-                model_ev.eval()
-                with torch.no_grad():
-                    output = model_ev.forward(input_tensor)
+                torch.save(
+                    model_ev.state_dict(),
+                    os.path.join(MODEL_DIR, model_filename),
+                )
+                # model_ev.eval()
+                # with torch.no_grad():
+                #     output = model_ev.forward(input_tensor)
 
-                # Postprocess the output
-                output_image = output.squeeze(0).cpu()  # Remove batch dimension
-                output_image = (output_image > 0.5).float()
+                # # Postprocess the output
+                # output_image = output.squeeze(0).cpu()  # Remove batch dimension
+                # output_image = (output_image > 0.5).float()
 
-                save_image(output_image, output_filename)
+                # save_image(output_image, output_filename)
+
+                # plt.cla()
+                # plt.plot(np.arange(0, len(losses), 1), losses)
+                # plt.savefig(os.path.join(TEST_DIR, "train_loss.png"))
+
+                epoch_dict = {"loss": losses}
+                df = pd.DataFrame(epoch_dict)
+                df.to_csv(loss_filename)
 
                 # if (i + 1) % 10 == 0:
                 #     print(f"Batch [{i+1}/{len(dataloader)}], Loss: {loss.item():.4f}")
@@ -193,5 +218,6 @@ if __name__ == "__main__":
         ]
     )
 
+    plt.cla()
     plt.plot(np.arange(0, num_epochs, 1), losses)
     plt.savefig(os.path.join(TEST_DIR, "train_loss.png"))

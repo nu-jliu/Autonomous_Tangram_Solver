@@ -25,9 +25,21 @@ add_executable(tangram_detection src/tangram_detection.cpp)
 target_include_directories(tangram_detection PRIVATE include)
 target_link_libraries(tangram_detection 
   ${OpenCV_LIBS}
-  ${Boost_LIBRARIES}
 )
 ament_target_dependencies(tangram_detection 
+  rclcpp
+  cv_bridge
+  sensor_msgs
+  tangram_msgs
+)
+
+add_executable(image_publisher src/image_publisher.cpp)
+target_include_directories(image_publisher PRIVATE include)
+target_link_libraries(image_publisher 
+  ${OpenCV_LIBS}
+  ${Boost_LIBRARIES}
+)
+ament_target_dependencies(image_publisher
   rclcpp
   cv_bridge
   sensor_msgs
@@ -41,7 +53,14 @@ DESTINATION include
 
 install(TARGETS 
   tangram_detection
+  image_publisher
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY 
+  launch
+  images
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

@@ -6,7 +6,12 @@ import time
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_DIR = os.path.join(FILE_DIR, "..", "test")
+MODEL_DIR = os.path.join(FILE_DIR, "..", "model")
 HOME_DIR = os.environ["HOME"]
+
+REMOTE_DIR = "/home/jingkun/Final_Project/src/Autonomous_Tangram_Solver/model"
+REMOTE_TEST_DIR = os.path.join(REMOTE_DIR, "test")
+REMOTE_MODEL_DIR = os.path.join(REMOTE_DIR, "model")
 
 
 def download_file_with_key(
@@ -57,37 +62,43 @@ if __name__ == "__main__":
         help="File name of the private key",
     )
     parser.add_argument(
-        "--filename",
-        default="output_image.jpg",
-        help="Output filename",
+        "--model",
+        default="tangram_cae.pth",
+        help="Output model filename",
+    )
+    parser.add_argument(
+        "--csv",
+        default="epoch_loss_cae.csv",
+        help="Output CSV filename",
     )
 
     args = parser.parse_args()
 
     host = args.host
+    port = 22
     username = args.username
     private_key_path = os.path.join(HOME_DIR, ".ssh", args.private_key)
-    output_file = args.filename
-    output_path = os.path.join(TEST_DIR, output_file)
+    csv_file = args.csv
+    model_file = args.model
 
     while True:
 
         download_file_with_key(
             host=host,
-            port=22,
+            port=port,
             username=username,
             private_key_path=private_key_path,  # Path to your private key
-            remote_file_path="/home/jingkun/Final_Project/src/Autonomous_Tangram_Solver/model/test/output_test.jpg",
-            local_file_path=output_path,
+            remote_file_path=os.path.join(REMOTE_TEST_DIR, csv_file),
+            local_file_path=os.path.join(TEST_DIR, csv_file),
         )
 
         download_file_with_key(
             host=host,
-            port=22,
+            port=port,
             username=username,
             private_key_path=private_key_path,  # Path to your private key
-            remote_file_path="/home/jingkun/Final_Project/src/Autonomous_Tangram_Solver/model/test/train_loss.png",
-            local_file_path=os.path.join(TEST_DIR, "train_loss.png"),
+            remote_file_path=os.path.join(REMOTE_MODEL_DIR, model_file),
+            local_file_path=os.path.join(MODEL_DIR, model_file),
         )
 
         # time.sleep(1)
