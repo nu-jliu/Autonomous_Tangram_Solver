@@ -1,1 +1,0 @@
-/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/tangram_detection/include/tangram_detection/tangram_detection.hpp

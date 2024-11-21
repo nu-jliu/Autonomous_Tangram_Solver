@@ -1,1 +1,0 @@
-/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/build/tangram_msgs/ament_cmake_core/tangram_msgsConfig-version.cmake

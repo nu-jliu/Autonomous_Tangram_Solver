@@ -1,4 +1,0 @@
-source;share/tangram_msgs/local_setup.bash
-source;share/tangram_msgs/local_setup.dsv
-source;share/tangram_msgs/local_setup.sh
-source;share/tangram_msgs/local_setup.zsh

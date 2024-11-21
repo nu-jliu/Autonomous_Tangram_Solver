@@ -14,9 +14,10 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "msg/*.msg")
+file(GLOB SRV_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "srv/*.srv")
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-    # ${srv_files}
+    ${SRV_FILES}
     ${MSG_FILES}
     # ${action_files}
     DEPENDENCIES

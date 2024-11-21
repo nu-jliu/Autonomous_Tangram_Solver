@@ -1,10 +1,11 @@
 #include <memory>
 #include <chrono>
 
-#include "tangram_detection/tangram_detection.hpp"
 #include <boost/filesystem.hpp>
 #include <cv_bridge/cv_bridge.hpp>
 #include <std_msgs/msg/header.hpp>
+
+#include "tangram_detection/tangram_detection.hpp"
 
 namespace tangram_detection
 {
@@ -69,7 +70,7 @@ void TangramDetection::timer_callback_()
       // Extract contours from the edge-detected image
       std::vector<std::vector<cv::Point>> contours;
       // std::vector<cv::Vec4i> hierarchy; // This can be ignored if hierarchy isn't needed
-      cv::findContours(edges, contours, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
+      cv::findContours(edges, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
       // // Print the contours as lists of (x, y) coordinates
       // for (size_t i = 0; i < contours.size(); ++i) {
@@ -94,7 +95,7 @@ void TangramDetection::timer_callback_()
       for (const auto & contour : contours) {
         // Approximate the contour
         std::vector<cv::Point> approxContour;
-        double epsilon = 0.02 * cv::arcLength(contour, true);
+        const double epsilon = 0.02 * cv::arcLength(contour, true);
         cv::approxPolyDP(contour, approxContour, epsilon, true);
 
         const cv::Scalar color =
@@ -169,7 +170,10 @@ void TangramDetection::timer_callback_()
 
 void TangramDetection::sub_tangram_image_callback_(sensor_msgs::msg::Image::SharedPtr msg)
 {
-  cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::MONO8);
+  const cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(
+    msg,
+    sensor_msgs::image_encodings::MONO8
+  );
   source_img_ = image_ptr->image;
 
   if (!image_ready_) {

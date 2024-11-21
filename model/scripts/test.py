@@ -11,12 +11,24 @@ import time
 import pandas as pd
 import numpy as np
 
+import argparse
+
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_DIR = os.path.join(FILE_DIR, "..", "test")
 MODEL_DIR = os.path.join(FILE_DIR, "..", "model")
 DATASET_DIR = os.path.join(FILE_DIR, "..", "dataset")
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--filename",
+        default="23.png",
+        help="The file name for the input image for interence",
+    )
+
+    args = parser.parse_args()
+    test_filename = args.filename
 
     while True:
 
@@ -41,7 +53,7 @@ if __name__ == "__main__":
                 ]
             )
 
-            image_path = os.path.join(DATASET_DIR, "input_test", "23.png")
+            image_path = os.path.join(DATASET_DIR, "input_test", test_filename)
             input_image = Image.open(image_path).convert("L")  # Convert to grayscale
             input_tensor = transform(input_image).unsqueeze(0)  # Add batch dimension
             input_tensor = (input_tensor > 0.5).float()
@@ -69,14 +81,15 @@ if __name__ == "__main__":
 
                 plt.cla()
                 plt.plot(np.arange(0, len(losses), 1), losses)
+                plt.title("Loss at each Epoch")
                 plt.xlabel("Epoch")
                 plt.ylabel("Loss")
                 plt.savefig(os.path.join(TEST_DIR, "epoch_loss_cae.png"))
             except FileExistsError:
                 print("File not found")
 
-            print("Analysis saved")
+            print("Interenced image and loss image saved")
         except Exception as e:
             print(f"Received exception {e}")
 
-        time.sleep(0.1)
+        time.sleep(1)
