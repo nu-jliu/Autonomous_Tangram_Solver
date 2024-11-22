@@ -16,7 +16,7 @@ public:
 private:
   rclcpp::TimerBase::SharedPtr timer_;
 
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_segment_;
 
   cv::Mat image_;
   bool image_ready_;

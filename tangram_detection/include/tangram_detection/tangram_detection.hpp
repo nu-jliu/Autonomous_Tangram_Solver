@@ -19,7 +19,7 @@ public:
 private:
   rclcpp::TimerBase::SharedPtr timer_;
 
-  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_segment_;
 
   rclcpp::Publisher<tangram_msgs::msg::TangramPoses>::SharedPtr pub_tangram_poses_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_source_;
@@ -37,7 +37,7 @@ private:
 
   void timer_callback_();
 
-  void sub_tangram_image_callback_(sensor_msgs::msg::Image::SharedPtr msg);
+  void sub_tangram_image_segment_callback_(sensor_msgs::msg::Image::SharedPtr msg);
 };
 }  // namespace tangram_detection
 #endif  // TANGRAM_DETECTION__TANGRAM_DETECTION_HPP_

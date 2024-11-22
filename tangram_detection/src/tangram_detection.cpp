@@ -6,6 +6,7 @@
 #include <std_msgs/msg/header.hpp>
 
 #include "tangram_detection/tangram_detection.hpp"
+#include "tangram_detection/tangram_match.hpp"
 
 namespace tangram_detection
 {
@@ -16,11 +17,11 @@ TangramDetection::TangramDetection()
 {
   timer_ = create_wall_timer(0.1s, std::bind(&TangramDetection::timer_callback_, this));
 
-  sub_image_ =
+  sub_image_segment_ =
     create_subscription<sensor_msgs::msg::Image>(
-    "tangram/image", 10,
+    "tangram/image/segment", 10,
     std::bind(
-      &TangramDetection::sub_tangram_image_callback_,
+      &TangramDetection::sub_tangram_image_segment_callback_,
       this,
       std::placeholders::_1
     ));
@@ -56,9 +57,9 @@ void TangramDetection::timer_callback_()
       int kernelSize = 3; // Size of the structuring element
       cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize, kernelSize));
 
-      cv::erode(source_img_, erode, kernel);
+      cv::erode(source_img_, erode, kernel, cv::Point(-1, -1), 2);
       cv::dilate(source_img_, dilate, kernel);
-      cv::morphologyEx(dilate, opened, cv::MORPH_OPEN, kernel);
+      cv::morphologyEx(erode, opened, cv::MORPH_OPEN, kernel);
       cv::morphologyEx(opened, closed, cv::MORPH_CLOSE, kernel);
 
       // Perform Canny edge detection
@@ -98,9 +99,54 @@ void TangramDetection::timer_callback_()
         const double epsilon = 0.02 * cv::arcLength(contour, true);
         cv::approxPolyDP(contour, approxContour, epsilon, true);
 
-        const cv::Scalar color =
-          cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+
+        const cv::Rect bounding_box = cv::boundingRect(contour);
+        const int w = bounding_box.width;
+        const int h = bounding_box.height;
+
+        std::stringstream ss_size("");
+        ss_size << w << ", " << h;
+        const std::string text_size = ss_size.str();
+
+        const cv::Scalar color(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
         cv::polylines(contours_approx, contour, true, color);
+
+        const cv::Moments m = cv::moments(contour);
+
+        if (m.m00 != 0) {
+          const int cx = static_cast<int>(m.m10 / m.m00);
+          const int cy = static_cast<int>(m.m01 / m.m00);
+
+          const cv::Point center(cx, cy);
+          const cv::Point center_up(cx - 20, cy);
+          const cv::Point center_down(cx - 20, cy + 10);
+
+          std::stringstream ss_center("");
+          ss_center << cx << ", " << cy;
+          const std::string text_center = ss_center.str();
+
+          const cv::Scalar color_text(255, 255, 255);
+
+          cv::circle(contours_approx, center, 5, color, -1);
+          cv::putText(
+            contours_approx,
+            text_size,
+            center_up,
+            cv::FONT_HERSHEY_SIMPLEX,
+            0.5,
+            color_text,
+            1
+          );
+          cv::putText(
+            contours_approx,
+            text_center,
+            center_down,
+            cv::FONT_HERSHEY_SIMPLEX,
+            0.5,
+            color_text,
+            1
+          );
+        }
 
         // // Find the closest Tangram piece
         // int closestPiece = findClosestTangramPiece(approxContour, tangramPieces);
@@ -162,13 +208,14 @@ void TangramDetection::timer_callback_()
         contours_approx
       ).toImageMsg();
       pub_image_contours_approx_->publish(*image_contour_approx);
+
     } catch (cv::Exception & e) {
       RCLCPP_ERROR_STREAM(get_logger(), "Got Exception: " << e.what());
     }
   }
 }
 
-void TangramDetection::sub_tangram_image_callback_(sensor_msgs::msg::Image::SharedPtr msg)
+void TangramDetection::sub_tangram_image_segment_callback_(sensor_msgs::msg::Image::SharedPtr msg)
 {
   const cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(
     msg,

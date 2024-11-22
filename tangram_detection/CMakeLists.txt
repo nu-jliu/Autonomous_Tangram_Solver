@@ -46,6 +46,15 @@ ament_target_dependencies(image_publisher
   tangram_msgs
 )
 
+add_library(tangram_match src/tangram_match.cpp)
+target_include_directories(tangram_match PRIVATE include)
+ament_target_dependencies(tangram_match rclcpp)
+
+install(TARGETS tangram_match
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 install(DIRECTORY include/
 DESTINATION include
@@ -60,7 +69,16 @@ install(TARGETS
 install(DIRECTORY 
   launch
   images
+  model
   DESTINATION share/${PROJECT_NAME}
+)
+
+ament_python_install_package(${PROJECT_NAME})
+
+install(PROGRAMS 
+    ${PROJECT_NAME}/tangram_segment.py
+    ${PROJECT_NAME}/network.py
+    DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

@@ -34,7 +34,7 @@ ImagePublisher::ImagePublisher()
   image_full_path_ = full_path.string();
 
   timer_ = create_wall_timer(0.01s, std::bind(&ImagePublisher::timer_callback_, this));
-  pub_image_ = create_publisher<sensor_msgs::msg::Image>("tangram/image", 10);
+  pub_image_segment_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/segment", 10);
 }
 
 void ImagePublisher::timer_callback_()
@@ -55,7 +55,7 @@ void ImagePublisher::timer_callback_()
     sensor_msgs::image_encodings::MONO8,
     image_
   ).toImageMsg();
-  pub_image_->publish(*image_msg);
+  pub_image_segment_->publish(*image_msg);
 }
 }
 
