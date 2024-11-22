@@ -13,8 +13,13 @@ def generate_launch_description():
         name="image_publisher",
         parameters=[
             {
-                "image_dir": "/home/jingkun/Documents/Final_Project/src/Autonomous_Tangram_Solver/model/dataset/output_cae",
-                "image_name": "21.png",
+                "image_dir": PathJoinSubstitution(
+                    [
+                        FindPackageShare(package_name),
+                        "images",
+                    ]
+                ),
+                "image_name": "test.png",
             }
         ],
     )
@@ -57,8 +62,8 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            # node_publisher,
-            node_segment,
+            node_publisher,
+            # node_segment,
             node_detection,
             node_video_server,
         ]

@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 TangramDetection::TangramDetection()
 : rclcpp::Node("tangram_detection"), image_ready_(false)
 {
-  timer_ = create_wall_timer(0.1s, std::bind(&TangramDetection::timer_callback_, this));
+  timer_ = create_wall_timer(0.5s, std::bind(&TangramDetection::timer_callback_, this));
 
   sub_image_segment_ =
     create_subscription<sensor_msgs::msg::Image>(
@@ -71,7 +71,7 @@ void TangramDetection::timer_callback_()
       // Extract contours from the edge-detected image
       std::vector<std::vector<cv::Point>> contours;
       // std::vector<cv::Vec4i> hierarchy; // This can be ignored if hierarchy isn't needed
-      cv::findContours(edges, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+      cv::findContours(edges, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
       // // Print the contours as lists of (x, y) coordinates
       // for (size_t i = 0; i < contours.size(); ++i) {
@@ -131,7 +131,7 @@ void TangramDetection::timer_callback_()
 
           cv::circle(contours_approx, center, 5, color, -1);
 
-          const double scale = 0.2;
+          const double scale = 0.3;
           cv::putText(
             contours_approx,
             text_size,

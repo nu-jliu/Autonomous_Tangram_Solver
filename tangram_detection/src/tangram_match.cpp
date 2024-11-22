@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "tangram_detection/tangram_match.hpp"
 
 namespace tangram_detection
@@ -9,7 +11,7 @@ size_t find_closest_tangram_piece(const std::vector<cv::Point> & contour)
 
   for (size_t i = 0; i < tangrams_pieces.size(); ++i) {
     const auto piece = tangrams_pieces.at(i);
-    const double match_score = cv::matchShapes(contour, piece, cv::CONTOURS_MATCH_I1, 0.0);
+    const double match_score = cv::matchShapes(contour, piece, cv::CONTOURS_MATCH_I2, 0.0);
 
     if (match_score < best_match_score) {
       best_match_score = match_score;
