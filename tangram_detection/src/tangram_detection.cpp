@@ -99,6 +99,7 @@ void TangramDetection::timer_callback_()
         const double epsilon = 0.02 * cv::arcLength(contour, true);
         cv::approxPolyDP(contour, approxContour, epsilon, true);
 
+        const std::string name = closest_tangram_piece_name(contour);
 
         const cv::Rect bounding_box = cv::boundingRect(contour);
         const int w = bounding_box.width;
@@ -120,6 +121,7 @@ void TangramDetection::timer_callback_()
           const cv::Point center(cx, cy);
           const cv::Point center_up(cx - 20, cy);
           const cv::Point center_down(cx - 20, cy + 10);
+          const cv::Point center_lower(cx - 20, cy + 20);
 
           std::stringstream ss_center("");
           ss_center << cx << ", " << cy;
@@ -128,12 +130,14 @@ void TangramDetection::timer_callback_()
           const cv::Scalar color_text(255, 255, 255);
 
           cv::circle(contours_approx, center, 5, color, -1);
+
+          const double scale = 0.2;
           cv::putText(
             contours_approx,
             text_size,
             center_up,
             cv::FONT_HERSHEY_SIMPLEX,
-            0.5,
+            scale,
             color_text,
             1
           );
@@ -142,7 +146,16 @@ void TangramDetection::timer_callback_()
             text_center,
             center_down,
             cv::FONT_HERSHEY_SIMPLEX,
-            0.5,
+            scale,
+            color_text,
+            1
+          );
+          cv::putText(
+            contours_approx,
+            name,
+            center_lower,
+            cv::FONT_HERSHEY_SIMPLEX,
+            scale,
             color_text,
             1
           );
