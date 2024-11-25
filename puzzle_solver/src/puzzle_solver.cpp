@@ -6,38 +6,39 @@
 #include <std_msgs/msg/header.hpp>
 
 #include "puzzle_solver/puzzle_solver.hpp"
-#include "puzzle_solver/tangram_match.hpp"
+// #include "puzzle_solver/tangram_match.hpp"
+#include "tangram_utils/tangram_match.hpp"
 
 namespace puzzle_solver
 {
 using namespace std::chrono_literals;
 
 TangramSolver::TangramSolver()
-: rclcpp::Node("puzzle_solver"), image_ready_(false)
+: rclcpp::Node("puzzle_solver"), image_ready_(false), rng_(0xffffffff)
 {
-  timer_ = create_wall_timer(0.1s, std::bind(&TangramSolver::timer_callback_, this));
+  timer_ = create_wall_timer(0.01s, std::bind(&TangramSolver::timer_callback_, this));
 
   sub_image_inferenced_ =
     create_subscription<sensor_msgs::msg::Image>(
-    "tangram/image/inferenced", 10,
+    "puzzle/image/inferenced", 10,
     std::bind(
       &TangramSolver::sub_tangram_image_inferenced_callback_,
       this,
       std::placeholders::_1
     ));
 
-  pub_image_source_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/source", 10);
-  pub_image_dialate_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/dilate", 10);
-  pub_image_erode_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/erode", 10);
-  pub_image_opened_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/opened", 10);
-  pub_image_closed_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/closed", 10);
-  pub_image_edges_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/edges", 10);
+  pub_image_source_ = create_publisher<sensor_msgs::msg::Image>("puzzle/image/source", 10);
+  pub_image_dialate_ = create_publisher<sensor_msgs::msg::Image>("puzzle/image/dilate", 10);
+  pub_image_erode_ = create_publisher<sensor_msgs::msg::Image>("puzzle/image/erode", 10);
+  pub_image_opened_ = create_publisher<sensor_msgs::msg::Image>("puzzle/image/opened", 10);
+  pub_image_closed_ = create_publisher<sensor_msgs::msg::Image>("puzzle/image/closed", 10);
+  pub_image_edges_ = create_publisher<sensor_msgs::msg::Image>("puzzle/image/edges", 10);
   pub_image_contours_raw_ = create_publisher<sensor_msgs::msg::Image>(
-    "tangram/image/contours/raw",
+    "puzzle/image/contours/raw",
     10
   );
   pub_image_contours_labeled_ = create_publisher<sensor_msgs::msg::Image>(
-    "tangram/image/contours/labeled",
+    "puzzle/image/contours/labeled",
     10
   );
 }
@@ -63,10 +64,10 @@ void TangramSolver::timer_callback_()
       cv::morphologyEx(opened, closed, cv::MORPH_CLOSE, kernel);
 
       // Perform Canny edge detection
-      const double lowThreshold = 50.0;
-      const double highThreshold = 150.0;
+      const double threshold_low = 50.0;
+      const double threshold_high = 150.0;
       // int kernelSize = 3;   // Kernel size for the Sobel operator
-      cv::Canny(closed, edges, lowThreshold, highThreshold);
+      cv::Canny(closed, edges, threshold_low, threshold_high);
 
       // Extract contours from the edge-detected image
       std::vector<std::vector<cv::Point>> contours;
@@ -86,38 +87,40 @@ void TangramSolver::timer_callback_()
       //   // std::cout << std::endl;
       // }
 
+      const int low = 127;
+      const int high = 256;
+
       // RCLCPP_INFO_STREAM(get_logger(), edges.size());
       contours_raw = cv::Mat::zeros(edges.size(), CV_8UC3);
-      cv::RNG rng(12345); // Random color generator for contours
+      // cv::RNG rng(12345); // Random color generator for contours
       for (size_t i = 0; i < contours.size(); ++i) {
-        const int low = 127;
-        const int high = 256;
 
-        const cv::Scalar color = cv::Scalar(
-          rng.uniform(low, high),
-          rng.uniform(low, high),
-          rng.uniform(low, high)
+
+        const cv::Scalar color(
+          rng_.uniform(low, high),
+          rng_.uniform(low, high),
+          rng_.uniform(low, high)
         );
-        cv::drawContours(contours_raw, contours, (int)i, color, 1);
+        cv::drawContours(contours_raw, contours, static_cast<int>(i), color, 1);
         // cv::polylines(target_img_, contours.at(i), true, color);
       }
 
       contours_labeled = cv::Mat::zeros(edges.size(), CV_8UC3);
       for (const auto & contour : contours) {
         // Approximate the contour
-        std::vector<cv::Point> approxContour;
+        std::vector<cv::Point> approx_contour;
         const double epsilon = 0.02 * cv::arcLength(contour, true);
-        cv::approxPolyDP(contour, approxContour, epsilon, true);
+        cv::approxPolyDP(contour, approx_contour, epsilon, true);
 
-        const std::string name = closest_tangram_piece_name(approxContour);
+        const std::string name = tangram_utils::closest_tangram_piece_name(approx_contour);
 
-        const double area = cv::contourArea(approxContour);
+        const double area = cv::contourArea(approx_contour);
 
         std::stringstream ss_area("");
         ss_area << area;
         const std::string text_area = ss_area.str();
 
-        const cv::Rect bounding_box = cv::boundingRect(approxContour);
+        const cv::Rect bounding_box = cv::boundingRect(approx_contour);
         const int w = bounding_box.width;
         const int h = bounding_box.height;
 
@@ -125,10 +128,14 @@ void TangramSolver::timer_callback_()
         ss_size << w << ", " << h;
         const std::string text_size = ss_size.str();
 
-        const cv::Scalar color(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
-        cv::polylines(contours_labeled, contour, true, color);
+        const cv::Scalar color(
+          rng_.uniform(low, high),
+          rng_.uniform(low, high),
+          rng_.uniform(low, high)
+        );
+        cv::polylines(contours_labeled, approx_contour, true, color);
 
-        const cv::Moments m = cv::moments(contour);
+        const cv::Moments m = cv::moments(approx_contour);
 
         if (m.m00 != 0) {
           const int cx = static_cast<int>(m.m10 / m.m00);
@@ -178,7 +185,7 @@ void TangramSolver::timer_callback_()
         }
 
         // // Find the closest Tangram piece
-        // int closestPiece = findClosestTangramPiece(approxContour, tangramPieces);
+        // int closestPiece = findClosestTangramPiece(approx_contour, tangramPieces);
         // matchedTangramIndices.push_back(closestPiece);
       }
 

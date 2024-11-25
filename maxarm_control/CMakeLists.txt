@@ -1,29 +1,33 @@
 cmake_minimum_required(VERSION 3.8)
-project(tangram_msgs)
+project(maxarm_control)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-O3 -Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
-find_package(rosidl_default_generators REQUIRED)
-find_package(std_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(tangram_msgs REQUIRED)
+find_package(CppLinuxSerial REQUIRED)
 
-file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "msg/*.msg")
-file(GLOB SRV_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "srv/*.srv")
-file(GLOB ACTION_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "action/*.action")
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-    ${SRV_FILES}
-    ${MSG_FILES}
-    ${ACTION_FILES}
-    DEPENDENCIES
-    std_msgs
-    geometry_msgs
+
+add_executable(arm_control src/arm_control.cpp)
+target_include_directories(arm_control PRIVATE include)
+target_link_libraries(arm_control 
+  CppLinuxSerial::CppLinuxSerial
+)
+ament_target_dependencies(arm_control
+  rclcpp
+  rclcpp_action
+  sensor_msgs
+  tangram_msgs
 )
 
 if(BUILD_TESTING)

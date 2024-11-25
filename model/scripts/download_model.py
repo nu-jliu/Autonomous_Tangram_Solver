@@ -9,7 +9,7 @@ TEST_DIR = os.path.join(FILE_DIR, "..", "test")
 MODEL_DIR = os.path.join(FILE_DIR, "..", "model")
 HOME_DIR = os.environ["HOME"]
 
-REMOTE_DIR = "/home/jingkun/Final_Project/src/Autonomous_Tangram_Solver/model"
+REMOTE_DIR = os.path.join(HOME_DIR, "Final_Project/src/Autonomous_Tangram_Solver/model")
 REMOTE_TEST_DIR = os.path.join(REMOTE_DIR, "test")
 REMOTE_MODEL_DIR = os.path.join(REMOTE_DIR, "model")
 
@@ -101,4 +101,4 @@ if __name__ == "__main__":
             local_file_path=os.path.join(MODEL_DIR, model_file),
         )
 
-        # time.sleep(1)
+        time.sleep(2)

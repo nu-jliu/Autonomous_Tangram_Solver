@@ -81,12 +81,12 @@ class PuzzleSegment(Node):
 
         self.pub_image_target = self.create_publisher(
             Image,
-            "tangram/image/target",
+            "puzzle/image/target",
             10,
         )
         self.pub_image_inferenced = self.create_publisher(
             Image,
-            "tangram/image/inferenced",
+            "puzzle/image/inferenced",
             10,
         )
 

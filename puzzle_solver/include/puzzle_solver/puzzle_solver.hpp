@@ -32,6 +32,7 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_contours_labeled_;
 
   bool image_ready_;
+  cv::RNG rng_;
   cv::Mat source_img_;
   cv::Mat target_img_;
 

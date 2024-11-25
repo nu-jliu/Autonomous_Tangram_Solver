@@ -1,30 +1,15 @@
 cmake_minimum_required(VERSION 3.8)
-project(tangram_msgs)
+project(trangram_bot)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-O3 -Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
-find_package(rosidl_default_generators REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-
-file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "msg/*.msg")
-file(GLOB SRV_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "srv/*.srv")
-file(GLOB ACTION_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "action/*.action")
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-    ${SRV_FILES}
-    ${MSG_FILES}
-    ${ACTION_FILES}
-    DEPENDENCIES
-    std_msgs
-    geometry_msgs
-)
+# find_package(<dependency> REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
