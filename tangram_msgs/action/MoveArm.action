@@ -1,4 +1,5 @@
-geometry_msgs/Pose goal
+geometry_msgs/Vector3 goal
+bool pick
 ---
 bool success
 ---

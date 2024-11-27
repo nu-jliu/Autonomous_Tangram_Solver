@@ -1,6 +1,8 @@
 #include <memory>
 #include <chrono>
 
+#include <rclcpp/rclcpp.hpp>
+
 #include <boost/filesystem.hpp>
 #include <cv_bridge/cv_bridge.hpp>
 #include <std_msgs/msg/header.hpp>
@@ -8,6 +10,7 @@
 #include "puzzle_solver/puzzle_solver.hpp"
 // #include "puzzle_solver/tangram_match.hpp"
 #include "tangram_utils/tangram_match.hpp"
+#include "tangram_msgs/msg/tangram_piece.hpp"
 
 namespace puzzle_solver
 {
@@ -41,6 +44,8 @@ TangramSolver::TangramSolver()
     "puzzle/image/contours/labeled",
     10
   );
+
+  pub_tangram_pieces_ = create_publisher<tangram_msgs::msg::TangramPieces>("place/pixel", 10);
 }
 
 TangramSolver::~TangramSolver()
@@ -53,6 +58,10 @@ void TangramSolver::timer_callback_()
   if (image_ready_) {
 
     try {
+      // const int row_size = source_img_.rows;
+      const int col_size = source_img_.cols;
+
+      tangram_msgs::msg::TangramPieces pieces_msg;
 
       cv::Mat erode, dilate, opened, closed, edges, contours_raw, contours_labeled;
       int kernelSize = 3; // Size of the structuring element
@@ -75,7 +84,7 @@ void TangramSolver::timer_callback_()
       cv::findContours(edges, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
       if (contours.size() < 7ul) {
-        RCLCPP_WARN(get_logger(), "Not enough contour detected, skipped");
+        RCLCPP_DEBUG(get_logger(), "Not enough contour detected, skipped");
         return;
       }
       // // Print the contours as lists of (x, y) coordinates
@@ -112,13 +121,24 @@ void TangramSolver::timer_callback_()
         const double epsilon = 0.02 * cv::arcLength(contour, true);
         cv::approxPolyDP(contour, approx_contour, epsilon, true);
 
-        const std::string name = tangram_utils::closest_tangram_piece_name(approx_contour);
-
         const double area = cv::contourArea(approx_contour);
+
+        const size_t type = tangram_utils::find_closest_tangram_piece(approx_contour);
+        const std::string name = tangram_utils::closest_tangram_piece_name(approx_contour);
+        const double radian = tangram_utils::get_tangram_piece_orientation(
+          approx_contour,
+          contours_labeled
+        );
+        const double degree = radian * 180.0 / CV_PI;
+
 
         std::stringstream ss_area("");
         ss_area << area;
         const std::string text_area = ss_area.str();
+
+        std::stringstream ss_degree("");
+        ss_degree << degree;
+        const std::string text_degree = ss_degree.str();
 
         const cv::Rect bounding_box = cv::boundingRect(approx_contour);
         const int w = bounding_box.width;
@@ -145,6 +165,19 @@ void TangramSolver::timer_callback_()
           const cv::Point center_up(cx - 50, cy);
           const cv::Point center_down(cx - 50, cy + 15);
           const cv::Point center_lower(cx - 50, cy + 30);
+
+          tangram_msgs::msg::TangramPiece piece;
+
+          piece.location.x = static_cast<int32_t>(cx - col_size / 2);
+          piece.location.y = cy;
+
+          piece.theta = radian;
+          piece.type = static_cast<int32_t>(type);
+
+          const boost::uuids::uuid uuid = uuid_generator_();
+          piece.uuid = boost::uuids::to_string(uuid);
+
+          pieces_msg.pieces.push_back(piece);
 
           std::stringstream ss_center("");
           ss_center << cx << ", " << cy;
@@ -173,15 +206,15 @@ void TangramSolver::timer_callback_()
             color_text,
             1
           );
-          // cv::putText(
-          //   contours_approx,
-          //   name,
-          //   center_lower,
-          //   cv::FONT_HERSHEY_SIMPLEX,
-          //   scale,
-          //   color_text,
-          //   1
-          // );
+          cv::putText(
+            contours_labeled,
+            text_degree,
+            center_lower,
+            cv::FONT_HERSHEY_SIMPLEX,
+            scale,
+            color_text,
+            1
+          );
         }
 
         // // Find the closest Tangram piece
@@ -245,9 +278,12 @@ void TangramSolver::timer_callback_()
       ).toImageMsg();
       pub_image_contours_labeled_->publish(*image_contour_labeled);
 
-    } catch (cv::Exception & e) {
-      RCLCPP_ERROR_STREAM(get_logger(), "Got Exception: " << e.what());
+      pub_tangram_pieces_->publish(pieces_msg);
+    } catch (std::exception & e) {
+      RCLCPP_ERROR_STREAM_ONCE(get_logger(), "Got Exception: " << e.what());
     }
+  } else {
+    RCLCPP_DEBUG(get_logger(), "Image not ready yet");
   }
 }
 

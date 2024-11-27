@@ -1,5 +1,7 @@
 import torch
 import os
+
+import cv2
 from torchvision import transforms
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -34,6 +36,7 @@ if __name__ == "__main__":
 
         try:
             # Load model
+            print("load")
             model = CAE(input_channels=1)  # For grayscale
             model.load_state_dict(
                 torch.load(
@@ -41,6 +44,7 @@ if __name__ == "__main__":
                     weights_only=True,
                 )
             )
+
             model.eval()
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             model = model.to(device)
@@ -58,6 +62,33 @@ if __name__ == "__main__":
             input_tensor = transform(input_image).unsqueeze(0)  # Add batch dimension
             input_tensor = (input_tensor > 0.5).float()
             input_tensor = input_tensor.to(device)
+
+            input_array = input_tensor.squeeze(0).cpu().numpy()
+            input_array = (input_array * 255).astype(np.uint8)
+
+            if input_array.ndim > 2:
+                input_array = input_array[0]
+
+            # print("start")
+            # edges = cv2.Canny(input_array, 50.0, 150.0)
+            # contours, _ = cv2.findContours(
+            #     edges,
+            #     cv2.RETR_EXTERNAL,
+            #     cv2.CHAIN_APPROX_SIMPLE,
+            # )
+
+            # for contour in contours:
+            #     eplison = 0.02 * cv2.arcLength(contour, True)
+            #     contour_approx = cv2.approxPolyDP(contour, eplison, True)
+            #     print(cv2.contourArea(contour))
+
+            print(input_array.shape)
+            print(np.sum((input_array / 255).astype(bool)))
+
+            # cv2.imshow("Test", input_array)
+            # cv2.waitKey(0)
+
+            cv2.imwrite("test.png", input_array)
 
             # Perform inference
             with torch.no_grad():

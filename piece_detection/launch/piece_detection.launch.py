@@ -1,21 +1,33 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import (
+    PathJoinSubstitution,
+    LaunchConfiguration,
+    Command,
+    TextSubstitution,
+)
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
+from launch_ros.substitutions import FindPackageShare, ExecutableInPackage
 
 package_name = "piece_detection"
 
 
 def generate_launch_description():
-    # arg_live = DeclareLaunchArgument(
-    #     name="live",
-    #     default_value="true",
-    #     choices=["true", "false"],
-    #     description="If use live model prediction or use pre-saved the snapshot",
-    # )
+    arg_stream = DeclareLaunchArgument(
+        name="stream",
+        default_value="true",
+        choices=["true", "false"],
+        description="Whether to stream all video sources",
+    )
+    arg_use_rviz = DeclareLaunchArgument(
+        name="use_rviz",
+        default_value="true",
+        choices=["true", "false"],
+        description="Whether to use rviz to visualize",
+    )
+
     package_segment = "image_segmentation"
 
     include_realsense = IncludeLaunchDescription(
@@ -31,14 +43,39 @@ def generate_launch_description():
         launch_arguments={
             "pointcloud.enable": "true",
             "align_depth.enable": "true",
-            "json_file_path": PathJoinSubstitution(
-                [
-                    FindPackageShare(package_name),
-                    "config",
-                    "realsense_config.json",
-                ]
-            ),
+            # "json_file_path": PathJoinSubstitution(
+            #     [
+            #         FindPackageShare(package_name),
+            #         "config",
+            #         "realsense_config.json",
+            #     ]
+            # ),
         }.items(),
+    )
+
+    node_rs_model = Node(
+        name="rs_model",
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        parameters=[
+            {
+                "robot_description": Command(
+                    [
+                        ExecutableInPackage("xacro", "xacro"),
+                        TextSubstitution(text=" "),
+                        PathJoinSubstitution(
+                            [
+                                FindPackageShare(package="realsense2_description"),
+                                "urdf",
+                                "test_d435i_camera.urdf.xacro",
+                            ]
+                        ),
+                        TextSubstitution(text=" add_plug:=true"),
+                        TextSubstitution(text=" use_nominal_extrinsics:=true"),
+                    ]
+                )
+            }
+        ],
     )
 
     node_segment = Node(
@@ -66,17 +103,45 @@ def generate_launch_description():
         name="piece_detection",
     )
 
+    node_pixel_to_real = Node(
+        package=package_name,
+        executable="rs_pixel_to_real",
+        name="rs_pixel_to_real",
+    )
+
     node_video_server = Node(
         package="web_video_server",
         executable="web_video_server",
         name="web_video_server",
+        condition=IfCondition(LaunchConfiguration("stream")),
+    )
+
+    node_rviz = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        arguments=[
+            "-d",
+            PathJoinSubstitution(
+                [
+                    FindPackageShare(package_name),
+                    "config",
+                    "detection.rviz",
+                ]
+            ),
+        ],
     )
 
     return LaunchDescription(
         [
+            arg_stream,
+            arg_use_rviz,
             include_realsense,
+            node_rs_model,
             node_segment,
             node_detection,
+            node_pixel_to_real,
             node_video_server,
+            node_rviz,
         ]
     )

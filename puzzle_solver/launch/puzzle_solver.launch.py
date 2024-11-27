@@ -9,11 +9,17 @@ package_name = "puzzle_solver"
 
 
 def generate_launch_description():
-    arg_live = DeclareLaunchArgument(
-        name="live",
+    arg_real_time = DeclareLaunchArgument(
+        name="real_time",
         default_value="true",
         choices=["true", "false"],
-        description="If use live model prediction or use pre-saved the snapshot",
+        description="Whether to solve the puzzle in real time",
+    )
+    arg_stream = DeclareLaunchArgument(
+        name="stream",
+        default_value="true",
+        choices=["true", "false"],
+        description="Whether to stream the all image topics",
     )
 
     node_publisher = Node(
@@ -31,7 +37,7 @@ def generate_launch_description():
                 "image_name": "test.png",
             }
         ],
-        condition=UnlessCondition(LaunchConfiguration("live")),
+        condition=UnlessCondition(LaunchConfiguration("real_time")),
     )
 
     package_segment = "image_segmentation"
@@ -58,28 +64,43 @@ def generate_launch_description():
             }
         ],
         output="screen",
-        condition=IfCondition(LaunchConfiguration("live")),
+        condition=IfCondition(LaunchConfiguration("real_time")),
     )
 
-    node_detection = Node(
+    node_solver = Node(
         package=package_name,
         executable=package_name,
         name=package_name,
         output="screen",
     )
 
+    node_pixel_to_real = Node(
+        package=package_name,
+        executable="solution_pixel_to_real",
+        name="solution_pixel_to_real",
+        parameters=[
+            {
+                "scale": 0.00085,
+                "offset": -0.3,
+            }
+        ],
+    )
+
     node_video_server = Node(
         package="web_video_server",
         executable="web_video_server",
         name="web_video_server",
+        condition=IfCondition(LaunchConfiguration("stream")),
     )
 
     return LaunchDescription(
         [
-            arg_live,
+            arg_real_time,
+            arg_stream,
             node_publisher,
             node_segment,
-            node_detection,
+            node_solver,
+            node_pixel_to_real,
             node_video_server,
         ]
     )

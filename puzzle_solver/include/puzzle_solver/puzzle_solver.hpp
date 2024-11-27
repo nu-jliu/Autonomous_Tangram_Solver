@@ -5,8 +5,12 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "tangram_msgs/msg/tangram_poses.hpp"
 #include <sensor_msgs/msg/image.hpp>
+#include "tangram_msgs/msg/tangram_pieces.hpp"
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace puzzle_solver
 {
@@ -21,7 +25,6 @@ private:
 
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_inferenced_;
 
-  rclcpp::Publisher<tangram_msgs::msg::TangramPoses>::SharedPtr pub_tangram_poses_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_source_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_erode_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_dialate_;
@@ -30,6 +33,10 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_edges_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_contours_raw_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_contours_labeled_;
+
+  rclcpp::Publisher<tangram_msgs::msg::TangramPieces>::SharedPtr pub_tangram_pieces_;
+
+  boost::uuids::random_generator_mt19937 uuid_generator_;
 
   bool image_ready_;
   cv::RNG rng_;

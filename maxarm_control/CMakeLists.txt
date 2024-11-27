@@ -11,23 +11,46 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tangram_msgs REQUIRED)
 find_package(CppLinuxSerial REQUIRED)
+find_package(Armadillo REQUIRED)
 
+include_directories(${ARMADILLO_INCLUDE_DIRS})
 
-
-add_executable(arm_control src/arm_control.cpp)
-target_include_directories(arm_control PRIVATE include)
-target_link_libraries(arm_control 
+add_executable(robot_control src/robot_control.cpp)
+target_include_directories(robot_control PRIVATE include)
+target_link_libraries(robot_control 
   CppLinuxSerial::CppLinuxSerial
 )
-ament_target_dependencies(arm_control
+ament_target_dependencies(robot_control
   rclcpp
   rclcpp_action
+  std_srvs
   sensor_msgs
   tangram_msgs
+)
+
+add_executable(frame_align src/frame_align.cpp)
+target_include_directories(frame_align PRIVATE include)
+target_link_libraries(frame_align ${ARMADILLO_LIBRARIES})
+ament_target_dependencies(frame_align 
+  rclcpp
+  tangram_msgs
+)
+
+install(TARGETS
+  robot_control
+  frame_align
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY 
+  config 
+  launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

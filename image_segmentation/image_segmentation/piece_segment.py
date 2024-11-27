@@ -16,6 +16,7 @@ import cv2
 
 from rcl_interfaces.msg import ParameterDescriptor
 from sensor_msgs.msg import Image
+from realsense2_camera_msgs.msg import Metadata
 
 
 class PieceSegment(Node):
@@ -99,6 +100,14 @@ class PieceSegment(Node):
             callback_group=self.callback_group,
         )
 
+        self.sub_metadata = self.create_subscription(
+            Metadata,
+            "/camera/camera/color/metadata",
+            self.sub_metadata_callback,
+            10,
+            callback_group=self.callback_group,
+        )
+
     def timer_callback(self):
         if self.segmented_image is not None and self.mask_image is not None:
             # self.get_logger()
@@ -129,7 +138,10 @@ class PieceSegment(Node):
     def sub_image_raw_callback(self, msg: Image):
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
-        cv_image = cv_image[180:540, 480:800, :]
+        # cv_image = cv_image[180:540, 480:800, :]
+        cv_image = cv2.flip(cv_image, 0)
+        self.get_logger().info(f"Shape: {cv_image.shape}")
+        # cv_image = cv_image[40:680, 320:960, :]
         w, h, _ = cv_image.shape
 
         img_scan_msg = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
@@ -176,6 +188,9 @@ class PieceSegment(Node):
         # self.cv_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         # self.get_logger().info("Image converted")
+
+    def sub_metadata_callback(self, msg: Metadata):
+        self.get_logger().info(f"Json Data: {msg.json_data}")
 
 
 def main(args=None):

@@ -47,9 +47,10 @@ def download_file_with_key(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--host",
-        default="sheep.mech.northwestern.edu",
-        help="Host name of the server",
+        "--device",
+        default="sheep",
+        choices=["lamb", "sheep"],
+        help="The device to download model from",
     )
     parser.add_argument(
         "--username",
@@ -74,7 +75,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    host = args.host
+    device = args.device
+    host = f"{device}.mech.northwestern.edu"
     port = 22
     username = args.username
     private_key_path = os.path.join(HOME_DIR, ".ssh", args.private_key)

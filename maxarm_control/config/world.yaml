@@ -1,0 +1,17 @@
+frame_align:
+  ros__parameters:
+    robot_tag:
+      r00: 1.0
+      r01: 0.0
+      r10: 0.0
+      r11: -1.0
+      px: 0.257
+      py: -0.07
+
+    camera_tag:
+      r00: 0.0
+      r01: 1.0
+      r10: 1.0
+      r11: 0.0
+      px: -0.0829405
+      py: -0.0346228

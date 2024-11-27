@@ -119,7 +119,7 @@ if __name__ == "__main__":
     dataset = BinaryImageDataset(input_dir, target_dir, transform=transform)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    model = CAE(input_channels=1)  # For RGB images
+    model = CAE(input_channels=1)  # For Binary images
     if load:
         model.load_state_dict(torch.load(model_filename))
 

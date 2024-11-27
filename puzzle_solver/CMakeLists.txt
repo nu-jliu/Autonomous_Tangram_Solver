@@ -11,6 +11,7 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(rcl_interfaces REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tangram_msgs REQUIRED)
 find_package(tangram_utils REQUIRED)
@@ -48,6 +49,14 @@ ament_target_dependencies(tangram_publisher
   tangram_msgs
 )
 
+add_executable(solution_pixel_to_real src/solution_pixel_to_real.cpp)
+target_include_directories(solution_pixel_to_real PRIVATE include)
+ament_target_dependencies(solution_pixel_to_real 
+  rclcpp 
+  rcl_interfaces 
+  tangram_msgs
+)
+
 install(DIRECTORY include/
   DESTINATION include
 )
@@ -55,6 +64,7 @@ install(DIRECTORY include/
 install(TARGETS 
   puzzle_solver
   tangram_publisher
+  solution_pixel_to_real
   DESTINATION lib/${PROJECT_NAME}
 )
 
