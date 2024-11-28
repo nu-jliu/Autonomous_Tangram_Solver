@@ -95,6 +95,9 @@ void PieceDetection::timer_callback_()
         cv::drawContours(img_contours, contours, static_cast<int>(i), color, i);
       }
 
+      std::vector<size_t> shapes;
+      shapes.clear();
+
       for (const auto & contour : contours) {
 
         std::vector<cv::Point> approx_contour;
@@ -109,6 +112,8 @@ void PieceDetection::timer_callback_()
         );
         const double degree = radian * 180.0 / CV_PI;
         const auto area = cv::contourArea(contour);
+
+        shapes.push_back(type);
 
         std::stringstream ss_area("");
         ss_area << area;
@@ -200,6 +205,11 @@ void PieceDetection::timer_callback_()
             1
           );
         }
+      }
+
+      if (!tangram_utils::validate_pieces(shapes)) {
+        RCLCPP_WARN_ONCE(get_logger(), "Invalid shapes");
+        return;
       }
 
       const auto image_edges = cv_bridge::CvImage(

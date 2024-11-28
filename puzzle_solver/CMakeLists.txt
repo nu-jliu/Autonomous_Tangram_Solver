@@ -69,6 +69,7 @@ install(TARGETS
 )
 
 install(DIRECTORY 
+  config
   launch
   images
   model

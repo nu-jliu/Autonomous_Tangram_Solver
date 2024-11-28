@@ -39,12 +39,13 @@ RobotControl::RobotControl()
   wait_for_data_();
 
   go_home_();
+  nozzle_off_();
   run_buzzer_();
 
-  srv_hold_ = create_service<std_srvs::srv::Trigger>(
-    "gripper/hold",
+  srv_grasp_ = create_service<std_srvs::srv::Trigger>(
+    "gripper/grasp",
     std::bind(
-      &RobotControl::srv_hold_callback_,
+      &RobotControl::srv_grasp_callback_,
       this,
       std::placeholders::_1,
       std::placeholders::_2
@@ -108,6 +109,12 @@ RobotControl::RobotControl()
 
 RobotControl::~RobotControl()
 {
+  RCLCPP_INFO(get_logger(), "Going home");
+  go_home_();
+
+  RCLCPP_INFO(get_logger(), "Turning off nozzle");
+  nozzle_off_();
+
   RCLCPP_INFO_STREAM(get_logger(), "Closing serial port " << serial_device_);
   arm_serial_port_->Close();
 
@@ -126,7 +133,7 @@ void RobotControl::timer_callback_()
   }
 }
 
-void RobotControl::srv_hold_callback_(
+void RobotControl::srv_grasp_callback_(
   const std_srvs::srv::Trigger::Request::SharedPtr request,
   std_srvs::srv::Trigger::Response::SharedPtr response
 )
@@ -155,17 +162,26 @@ rclcpp_action::GoalResponse RobotControl::action_move_arm_goal_callback_(
   tangram_msgs::action::MoveArm::Goal::ConstSharedPtr goal
 )
 {
+  const bool pick = goal->pick;
   const double x = goal->goal.x;
   const double y = goal->goal.y;
   const double z = goal->goal.z;
 
   const std::string uuid_str = get_uuid_string(uuid);
 
-  RCLCPP_INFO_STREAM(
-    get_logger(),
-    "Received request with uuid " << uuid_str <<
-      " to move MaxArm to position: " << x << ", " << y << ", " << z
-  );
+  if (pick) {
+    RCLCPP_INFO_STREAM(
+      get_logger(),
+      "Received request with uuid " << uuid_str <<
+        " to move MaxArm pick at position: " << x << ", " << y << ", " << z
+    );
+  } else {
+    RCLCPP_INFO_STREAM(
+      get_logger(),
+      "Received request with uuid " << uuid_str <<
+        " to move MaxArm place at position: " << x << ", " << y << ", " << z
+    );
+  }
 
   return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
@@ -201,20 +217,25 @@ void RobotControl::action_move_arm_execute_callback_(
   const auto goal = goal_handle->get_goal();
   auto result = std::make_shared<tangram_msgs::action::MoveArm::Result>();
 
-  const double x = goal->goal.x;
-  const double y = goal->goal.y;
-  const double z = goal->goal.z;
+  const bool pick = goal->pick;
+  const double x = goal->goal.x * 1000.0;
+  const double y = goal->goal.y * 1000.0;
+  const double z = goal->goal.z * 1000.0;
 
   std::stringstream ss_arm("");
   ss_arm << "arm.set_position((";
   ss_arm << x << ", " << y << ", " << z;
-  ss_arm << "), 1000)\r\n";
+  ss_arm << "), 1200)\r\n";
 
   arm_serial_port_->Write(ss_arm.str());
   wait_for_data_();
 
   const double radian = std::atan2(-x, -y);
-  const double degree = radian * 180.0 / M_PI;
+
+  double degree = radian * 180.0 / M_PI;
+  if (pick) {
+    degree += 90;
+  }
 
   std::stringstream ss_nozzle("");
   ss_nozzle << "nozzle.set_angle(";
@@ -224,7 +245,7 @@ void RobotControl::action_move_arm_execute_callback_(
   arm_serial_port_->Write(ss_nozzle.str());
   wait_for_data_();
 
-  std::this_thread::sleep_for(1s);
+  std::this_thread::sleep_for(1.5s);
 
   if (rclcpp::ok()) {
     result->success = true;
@@ -349,6 +370,14 @@ void RobotControl::run_buzzer_()
 
     std::this_thread::sleep_for(100ms);
   }
+}
+
+void RobotControl::nozzle_off_()
+{
+  arm_serial_port_->Write("nozzle.off()\r\n");
+  wait_for_data_();
+
+  std::this_thread::sleep_for(500ms);
 }
 }
 

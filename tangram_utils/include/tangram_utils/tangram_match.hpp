@@ -52,6 +52,11 @@ void draw_axis(
   const float scale
 );
 
+/// \brief Validate if has correct shapes
+/// \param shapes The shapes of the tangram pieces
+/// \return true if valid, othervise false
+bool validate_pieces(const std::vector<size_t> & shapes);
+
 /// \brief Get the angle between two vector in CCW direction
 /// \param v1 The first vector
 /// \param v2 The second vector

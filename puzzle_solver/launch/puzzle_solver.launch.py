@@ -79,10 +79,13 @@ def generate_launch_description():
         executable="solution_pixel_to_real",
         name="solution_pixel_to_real",
         parameters=[
-            {
-                "scale": 0.00085,
-                "offset": -0.3,
-            }
+            PathJoinSubstitution(
+                [
+                    FindPackageShare(package_name),
+                    "config",
+                    "env.yaml",
+                ]
+            )
         ],
     )
 

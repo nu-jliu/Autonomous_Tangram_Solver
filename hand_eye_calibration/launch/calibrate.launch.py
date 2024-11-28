@@ -35,13 +35,7 @@ def generate_launch_description():
         launch_arguments={
             "pointcloud.enable": "true",
             "align_depth.enable": "true",
-            # "json_file_path": PathJoinSubstitution(
-            #     [
-            #         FindPackageShare(package_name),
-            #         "config",
-            #         "realsense_config.json",
-            #     ]
-            # ),
+            "serial_no": "_243522073414",
         }.items(),
     )
 
@@ -68,6 +62,19 @@ def generate_launch_description():
                 )
             }
         ],
+    )
+
+    include_controller = IncludeLaunchDescription(
+        launch_description_source=PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("maxarm_control"),
+                    "launch",
+                    "robot.launch.py",
+                ]
+            )
+        ),
+        # launch_arguments={"stream": "false"}.items(),
     )
 
     node_apriltag = Node(
@@ -111,6 +118,7 @@ def generate_launch_description():
             arg_use_rviz,
             include_realsense,
             node_rs_model,
+            include_controller,
             node_apriltag,
             node_rviz,
         ]

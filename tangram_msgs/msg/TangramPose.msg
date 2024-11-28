@@ -8,4 +8,5 @@ int32 PARALELLOGRAM=4
 int32 type
 tangram_msgs/Point2D location
 float64 theta
+bool flipped
 string uuid

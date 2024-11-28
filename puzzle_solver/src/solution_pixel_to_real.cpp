@@ -20,7 +20,7 @@ SolutionPixelToReal::SolutionPixelToReal()
   offset_des.description = "Offset of the workspace";
 
   declare_parameter<double>("scale", 0.00085, scale_des);
-  declare_parameter<double>("offset", -0.4, offset_des);
+  declare_parameter<double>("offset", -0.45, offset_des);
 
   scale_ = get_parameter("scale").as_double();
   offset_ = get_parameter("offset").as_double();

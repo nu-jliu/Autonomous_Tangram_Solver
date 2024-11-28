@@ -43,20 +43,14 @@ def generate_launch_description():
         launch_arguments={
             "pointcloud.enable": "true",
             "align_depth.enable": "true",
-            # "json_file_path": PathJoinSubstitution(
-            #     [
-            #         FindPackageShare(package_name),
-            #         "config",
-            #         "realsense_config.json",
-            #     ]
-            # ),
+            "serial_no": "_243522073414",
         }.items(),
     )
 
     node_rs_model = Node(
-        name="rs_model",
         package="robot_state_publisher",
         executable="robot_state_publisher",
+        name="realsense_rsp",
         parameters=[
             {
                 "robot_description": Command(
@@ -130,6 +124,7 @@ def generate_launch_description():
                 ]
             ),
         ],
+        condition=IfCondition(LaunchConfiguration("use_rviz")),
     )
 
     return LaunchDescription(

@@ -30,6 +30,56 @@ void draw_axis(
   cv::line(img, p, q, color, 1, cv::LINE_AA);
 }
 
+bool validate_pieces(const std::vector<size_t> & shapes)
+{
+  int num_st = 0; /// Small Triangle
+  int num_mt = 0; /// Medium Triangle
+  int num_lt = 0; /// Large Triangle
+  int num_sq = 0; /// Square
+  int num_pl = 0; /// Parallelogram
+
+  for (const auto shape : shapes) {
+    switch (shape) {
+      case 0:
+        ++num_st;
+        break;
+
+      case 1:
+        ++num_mt;
+        break;
+
+      case 2:
+        ++num_lt;
+        break;
+
+      case 3:
+        ++num_sq;
+        break;
+
+      case 4:
+        ++num_pl;
+        break;
+
+      default:
+        return false;
+    }
+  }
+
+  if (num_lt != 2) {
+    return false;
+  } else if (num_mt != 1) {
+    return false;
+  } else if (num_st != 2) {
+    return false;
+  } else if (num_sq != 1) {
+    return false;
+  } else if (num_pl != 1) {
+    return false;
+  }
+
+  return true;
+}
+
 double get_ccw_angle(const cv::Point2d & v1, const cv::Point2d v2)
 {
   const double dot_product = v1.dot(v2);

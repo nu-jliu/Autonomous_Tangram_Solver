@@ -1,6 +1,8 @@
 #include <chrono>
 #include <memory>
 
+#include <rclcpp/rclcpp.hpp>
+
 #include "piece_detection/rs_pixel_to_real.hpp"
 
 #include <geometry_msgs/msg/transform_stamped.hpp>

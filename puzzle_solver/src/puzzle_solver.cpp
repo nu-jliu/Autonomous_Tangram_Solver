@@ -58,7 +58,7 @@ void TangramSolver::timer_callback_()
   if (image_ready_) {
 
     try {
-      // const int row_size = source_img_.rows;
+      const int row_size = source_img_.rows;
       const int col_size = source_img_.cols;
 
       tangram_msgs::msg::TangramPieces pieces_msg;
@@ -83,8 +83,8 @@ void TangramSolver::timer_callback_()
       // std::vector<cv::Vec4i> hierarchy; // This can be ignored if hierarchy isn't needed
       cv::findContours(edges, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-      if (contours.size() < 7ul) {
-        RCLCPP_DEBUG(get_logger(), "Not enough contour detected, skipped");
+      if (contours.size() != 7ul) {
+        RCLCPP_DEBUG(get_logger(), "Invalid contour detected, skipped");
         return;
       }
       // // Print the contours as lists of (x, y) coordinates
@@ -114,6 +114,9 @@ void TangramSolver::timer_callback_()
         // cv::polylines(target_img_, contours.at(i), true, color);
       }
 
+      std::vector<size_t> shapes;
+      shapes.clear();
+
       contours_labeled = cv::Mat::zeros(edges.size(), CV_8UC3);
       for (const auto & contour : contours) {
         // Approximate the contour
@@ -131,6 +134,7 @@ void TangramSolver::timer_callback_()
         );
         const double degree = radian * 180.0 / CV_PI;
 
+        shapes.push_back(type);
 
         std::stringstream ss_area("");
         ss_area << area;
@@ -169,7 +173,7 @@ void TangramSolver::timer_callback_()
           tangram_msgs::msg::TangramPiece piece;
 
           piece.location.x = static_cast<int32_t>(cx - col_size / 2);
-          piece.location.y = cy;
+          piece.location.y = static_cast<int32_t>(cy - row_size / 2);
 
           piece.theta = radian;
           piece.type = static_cast<int32_t>(type);
@@ -220,6 +224,11 @@ void TangramSolver::timer_callback_()
         // // Find the closest Tangram piece
         // int closestPiece = findClosestTangramPiece(approx_contour, tangramPieces);
         // matchedTangramIndices.push_back(closestPiece);
+      }
+
+      if (!tangram_utils::validate_pieces(shapes)) {
+        RCLCPP_WARN_ONCE(get_logger(), "Invalid shapes");
+        return;
       }
 
       const auto image_source = cv_bridge::CvImage(

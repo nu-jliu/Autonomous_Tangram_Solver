@@ -20,6 +20,8 @@ import rclpy.node
 from tangram_msgs.srv import SetTarget, SetTarget_Request, SetTarget_Response
 from sensor_msgs.msg import Image
 
+from google_speech import Speech
+
 
 class PuzzleSegment(Node):
 
@@ -90,6 +92,9 @@ class PuzzleSegment(Node):
             10,
         )
 
+        speech = Speech("Model loaded, please select input", "en")
+        speech.play()
+
     def timer_callback(self):
         # if self.input_tensor is True:
         #     segment_tensor = self.model.forward(self.input_tensor)
@@ -132,6 +137,9 @@ class PuzzleSegment(Node):
             image = PIL_Image.open(target_path).convert("L")
             tensor = self.transform(image).unsqueeze(0)
             tensor = (tensor > 0.5).float()
+
+            speech = Speech(f"Received input: {target_name}", "en")
+            speech.play()
 
             self.origin_array = tensor.squeeze(0).cpu().numpy()
             self.origin_array = (self.origin_array * 255).astype(np.uint8)

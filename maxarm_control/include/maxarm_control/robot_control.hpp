@@ -29,7 +29,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
 
   rclcpp::Service<tangram_msgs::srv::ReadPosition>::SharedPtr srv_read_position_;
-  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_hold_;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_grasp_;
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_release_;
 
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr pub_arm_joint_states_;
@@ -58,7 +58,7 @@ private:
     tangram_msgs::srv::ReadPosition::Response response
   );
 
-  void srv_hold_callback_(
+  void srv_grasp_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response
   );
@@ -129,14 +129,17 @@ private:
   /// \return The hex string representing the uuid
   const std::string get_uuid_string(const rclcpp_action::GoalUUID & uuid);
 
-  /// \brief Move the robot arm to home position
-  void go_home_();
-
   /// \brief Wait until data is available
   void wait_for_data_();
 
+  /// \brief Move the robot arm to home position
+  void go_home_();
+
   /// \brief Sound the buzzer for 3 times
   void run_buzzer_();
+
+  /// \brief Turn off the nozzle
+  void nozzle_off_();
 };
 }  // namespace maxarm_control
 #endif  // MAXARM_CONTROL__ROBOT_CONTROL_HPP___
