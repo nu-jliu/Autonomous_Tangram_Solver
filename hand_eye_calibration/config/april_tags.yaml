@@ -17,6 +17,6 @@
     
     # optional list of tags
     tag:
-      ids: [150]
-      frames: ["tangram"] # Corresponding to position on whiteboard
-      sizes: [0.04]
+      ids: [150, 200]
+      frames: [tangram, arm] # Corresponding to position on whiteboard
+      sizes: [0.04, 0.02]

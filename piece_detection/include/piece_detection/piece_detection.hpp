@@ -12,6 +12,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include "tangram_msgs/msg/tangram_pieces.hpp"
 
+#include <std_srvs/srv/trigger.hpp>
 
 namespace piece_detection
 {
@@ -23,12 +24,17 @@ public:
 private:
   rclcpp::TimerBase::SharedPtr timer_;
 
-  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_piece_segment_;
-  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_piece_mask_;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_reset_;
 
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_piece_edges_;
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_piece_contour_raw_;
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_piece_contour_labeled_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_segment_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_mask_;
+
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_erodes_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_opened_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_closed_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_edges_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_contour_raw_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_image_contour_labeled_;
 
   rclcpp::Publisher<tangram_msgs::msg::TangramPieces>::SharedPtr pub_piece_pixels_;
 
@@ -45,9 +51,14 @@ private:
 
   void timer_callback_();
 
-  void sub_image_piece_segment_callback_(sensor_msgs::msg::Image::SharedPtr msg);
+  void srv_reset_callback_(
+    const std_srvs::srv::Trigger::Request::SharedPtr request,
+    std_srvs::srv::Trigger::Response::SharedPtr response
+  );
 
-  void sub_image_piece_mask_callback_(sensor_msgs::msg::Image::SharedPtr msg);
+  void sub_image_segment_callback_(const sensor_msgs::msg::Image::SharedPtr msg);
+
+  void sub_image_mask_callback_(const sensor_msgs::msg::Image::SharedPtr msg);
 };
 }  // namespace piece_detection
 #endif  // PIECE_DETECTION__PIECE_DETECTION_HPP___

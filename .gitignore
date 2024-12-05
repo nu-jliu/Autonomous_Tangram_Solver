@@ -3,4 +3,9 @@
 **/log/**
 **/install/**
 
-*.pt
+sam2.1_*.pt
+yolo*.pt
+
+
+**/runs/**
+**/yolo_shapes/**

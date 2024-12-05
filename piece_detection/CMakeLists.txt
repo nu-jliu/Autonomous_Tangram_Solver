@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -36,6 +37,7 @@ target_link_libraries(piece_detection
 )
 ament_target_dependencies(piece_detection 
   rclcpp
+  std_srvs
   cv_bridge
   sensor_msgs
   tangram_msgs
@@ -46,6 +48,7 @@ target_include_directories(rs_pixel_to_real PRIVATE include)
 target_link_libraries(rs_pixel_to_real ${realsense2_LIBRARY})
 ament_target_dependencies(rs_pixel_to_real 
   rclcpp
+  std_srvs
   tf2_ros
   cv_bridge
   sensor_msgs

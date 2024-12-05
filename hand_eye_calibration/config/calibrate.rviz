@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /TF1
+        - /TF1/Frames1
         - /RobotModel1
       Splitter Ratio: 0.5
     Tree Height: 719
@@ -79,7 +80,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /camera/camera/depth/color/points
+        Value: /piece/camera/depth/color/points
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -87,39 +88,37 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
         base_link:
-          Value: true
+          Value: false
         camera_accel_frame:
-          Value: true
+          Value: false
         camera_accel_optical_frame:
-          Value: true
+          Value: false
         camera_bottom_screw_frame:
-          Value: true
+          Value: false
         camera_color_frame:
-          Value: true
+          Value: false
         camera_color_optical_frame:
           Value: true
         camera_depth_frame:
-          Value: true
+          Value: false
         camera_depth_optical_frame:
-          Value: true
+          Value: false
         camera_gyro_frame:
-          Value: true
+          Value: false
         camera_gyro_optical_frame:
-          Value: true
+          Value: false
         camera_infra1_frame:
-          Value: true
+          Value: false
         camera_infra1_optical_frame:
-          Value: true
+          Value: false
         camera_infra2_frame:
-          Value: true
+          Value: false
         camera_infra2_optical_frame:
-          Value: true
+          Value: false
         camera_link:
-          Value: true
-        tangram:
-          Value: true
+          Value: false
       Marker Scale: 0.30000001192092896
       Name: TF
       Show Arrows: true
@@ -134,8 +133,7 @@ Visualization Manager:
                   {}
               camera_color_frame:
                 camera_color_optical_frame:
-                  tangram:
-                    {}
+                  {}
               camera_depth_frame:
                 camera_depth_optical_frame:
                   {}
@@ -283,7 +281,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.6466392278671265
+      Distance: 0.4914458096027374
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -298,10 +296,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5303983688354492
+      Pitch: 0.43039846420288086
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.180405855178833
+      Yaw: 2.6454031467437744
     Saved: ~
 Window Geometry:
   Displays:

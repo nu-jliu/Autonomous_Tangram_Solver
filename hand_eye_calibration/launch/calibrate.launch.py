@@ -22,6 +22,20 @@ def generate_launch_description():
         description="Whether to use rviz to visualize",
     )
 
+    arg_launch_rs = DeclareLaunchArgument(
+        name="launch_rs",
+        default_value="true",
+        choices=["true", "false"],
+        description="Whether launch realsense",
+    )
+
+    arg_launch_robot = DeclareLaunchArgument(
+        name="launch_robot",
+        default_value="true",
+        choices=["true", "false"],
+        description="Whether launch robot",
+    )
+
     include_realsense = IncludeLaunchDescription(
         launch_description_source=PythonLaunchDescriptionSource(
             PathJoinSubstitution(
@@ -33,10 +47,12 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
+            "camera_namespace": "piece",
             "pointcloud.enable": "true",
             "align_depth.enable": "true",
             "serial_no": "_243522073414",
         }.items(),
+        condition=IfCondition(LaunchConfiguration("launch_rs")),
     )
 
     node_rs_model = Node(
@@ -62,6 +78,7 @@ def generate_launch_description():
                 )
             }
         ],
+        condition=IfCondition(LaunchConfiguration("launch_rs")),
     )
 
     include_controller = IncludeLaunchDescription(
@@ -74,6 +91,7 @@ def generate_launch_description():
                 ]
             )
         ),
+        condition=IfCondition(LaunchConfiguration("launch_robot")),
         # launch_arguments={"stream": "false"}.items(),
     )
 
@@ -91,9 +109,33 @@ def generate_launch_description():
             )
         ],
         remappings=[
-            ("image_rect", "camera/camera/color/image_raw"),
-            ("camera_info", "camera/camera/color/camera_info"),
+            ("image_rect", "piece/camera/color/image_raw"),
+            ("camera_info", "piece/camera/color/camera_info"),
         ],
+    )
+
+    node_calibrate = Node(
+        package=package_name,
+        executable="calibrate",
+        name="calibrate",
+        parameters=[
+            {
+                "source_frame": "camera_color_optical_frame",
+                "target_frame": "arm",
+            }
+        ],
+    )
+
+    node_scanner = Node(
+        package=package_name,
+        executable="scan_apriltag.py",
+        name="scan_apriltag",
+        # parameters=[
+        #     {
+        #         "source_frame": "camera_color_optical_frame",
+        #         "target_frame": "arm",
+        #     }
+        # ],
     )
 
     node_rviz = Node(
@@ -116,10 +158,14 @@ def generate_launch_description():
     return LaunchDescription(
         [
             arg_use_rviz,
+            arg_launch_rs,
+            arg_launch_robot,
             include_realsense,
             node_rs_model,
             include_controller,
             node_apriltag,
+            node_calibrate,
+            node_scanner,
             node_rviz,
         ]
     )

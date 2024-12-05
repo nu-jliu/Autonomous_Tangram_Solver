@@ -12,20 +12,32 @@
 #include "tangram_utils/tangram_match.hpp"
 #include "tangram_msgs/msg/tangram_piece.hpp"
 
+#include <std_srvs/srv/trigger.hpp>
+
 namespace puzzle_solver
 {
 using namespace std::chrono_literals;
 
-TangramSolver::TangramSolver()
+PuzzleSolver::PuzzleSolver()
 : rclcpp::Node("puzzle_solver"), image_ready_(false), rng_(0xffffffff)
 {
-  timer_ = create_wall_timer(0.01s, std::bind(&TangramSolver::timer_callback_, this));
+  timer_ = create_wall_timer(0.01s, std::bind(&PuzzleSolver::timer_callback_, this));
+
+  srv_reset_ = create_service<std_srvs::srv::Trigger>(
+    "puzzle/solver/reset",
+    std::bind(
+      &PuzzleSolver::srv_reset_callback_,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2
+    )
+  );
 
   sub_image_inferenced_ =
     create_subscription<sensor_msgs::msg::Image>(
     "puzzle/image/inferenced", 10,
     std::bind(
-      &TangramSolver::sub_tangram_image_inferenced_callback_,
+      &PuzzleSolver::sub_tangram_image_inferenced_callback_,
       this,
       std::placeholders::_1
     ));
@@ -48,12 +60,7 @@ TangramSolver::TangramSolver()
   pub_tangram_pieces_ = create_publisher<tangram_msgs::msg::TangramPieces>("place/pixel", 10);
 }
 
-TangramSolver::~TangramSolver()
-{
-  RCLCPP_INFO(get_logger(), "Shutting down the node");
-}
-
-void TangramSolver::timer_callback_()
+void PuzzleSolver::timer_callback_()
 {
   if (image_ready_) {
 
@@ -64,8 +71,11 @@ void TangramSolver::timer_callback_()
       tangram_msgs::msg::TangramPieces pieces_msg;
 
       cv::Mat erode, dilate, opened, closed, edges, contours_raw, contours_labeled;
-      int kernelSize = 3; // Size of the structuring element
-      cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize, kernelSize));
+      const int kernelSize = 3; // Size of the structuring element
+      const cv::Mat kernel = cv::getStructuringElement(
+        cv::MORPH_RECT,
+        cv::Size(kernelSize, kernelSize)
+      );
 
       cv::erode(source_img_, erode, kernel, cv::Point(-1, -1), 3);
       cv::dilate(source_img_, dilate, kernel);
@@ -220,15 +230,6 @@ void TangramSolver::timer_callback_()
             1
           );
         }
-
-        // // Find the closest Tangram piece
-        // int closestPiece = findClosestTangramPiece(approx_contour, tangramPieces);
-        // matchedTangramIndices.push_back(closestPiece);
-      }
-
-      if (!tangram_utils::validate_pieces(shapes)) {
-        RCLCPP_WARN_ONCE(get_logger(), "Invalid shapes");
-        return;
       }
 
       const auto image_source = cv_bridge::CvImage(
@@ -287,16 +288,37 @@ void TangramSolver::timer_callback_()
       ).toImageMsg();
       pub_image_contours_labeled_->publish(*image_contour_labeled);
 
+      if (!tangram_utils::validate_pieces(shapes)) {
+        RCLCPP_WARN_ONCE(get_logger(), "Invalid shapes");
+        return;
+      }
+
       pub_tangram_pieces_->publish(pieces_msg);
     } catch (std::exception & e) {
-      RCLCPP_ERROR_STREAM_ONCE(get_logger(), "Got Exception: " << e.what());
+      RCLCPP_ERROR_STREAM_ONCE(
+        get_logger(),
+        "Got Exception on line " << __LINE__ << ": " << e.what()
+      );
     }
   } else {
     RCLCPP_DEBUG(get_logger(), "Image not ready yet");
   }
 }
 
-void TangramSolver::sub_tangram_image_inferenced_callback_(sensor_msgs::msg::Image::SharedPtr msg)
+void PuzzleSolver::srv_reset_callback_(
+  const std_srvs::srv::Trigger::Request::SharedPtr request,
+  std_srvs::srv::Trigger::Response::SharedPtr response
+)
+{
+  (void) request;
+
+  image_ready_ = false;
+
+  RCLCPP_INFO_STREAM(get_logger(), "Node " << std::string(get_name()) << " resetted");
+  response->success = true;
+}
+
+void PuzzleSolver::sub_tangram_image_inferenced_callback_(sensor_msgs::msg::Image::SharedPtr msg)
 {
   const cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(
     msg,
@@ -318,7 +340,7 @@ void TangramSolver::sub_tangram_image_inferenced_callback_(sensor_msgs::msg::Ima
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<puzzle_solver::TangramSolver>();
+  auto node = std::make_shared<puzzle_solver::PuzzleSolver>();
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;

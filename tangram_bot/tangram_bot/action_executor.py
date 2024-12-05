@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.task import Future
 from rclpy.action import ActionServer
 from rclpy.action.server import ServerGoalHandle, GoalResponse, CancelResponse
 
@@ -37,6 +38,7 @@ class ActionExecutor(Node):
         self.actions_ready = False
         self.cancel_requested = False
         self.in_motion = False
+        self.calibration_ready = False
         self.robot_action: RobotAction = None
 
         # self.z_standoff = 0.12
@@ -67,6 +69,9 @@ class ActionExecutor(Node):
             10,
         )
 
+        self.srv_reset = self.create_service(Trigger, "reset", self.srv_reset_callback)
+        self.srv_ready = self.create_service(Trigger, "ready", self.srv_ready_callback)
+
         self.action_execute_action = ActionServer(
             self,
             ExecuteAction,
@@ -76,6 +81,56 @@ class ActionExecutor(Node):
             execute_callback=self.action_execute_action_execute_callback,
         )
 
+        self.cli_piece_segment_reset = self.create_client(
+            Trigger,
+            "piece/segment/reset",
+        )
+
+        self.cli_piece_detection_reset = self.create_client(
+            Trigger,
+            "piece/detection/reset",
+        )
+
+        self.cli_piece_p2r_reset = self.create_client(
+            Trigger,
+            "piece/p2r/reset",
+        )
+
+        self.cli_puzzle_segment_reset = self.create_client(
+            Trigger,
+            "puzzle/segment/reset",
+        )
+
+        self.cli_puzzle_solver_reset = self.create_client(
+            Trigger,
+            "puzzle/solver/reset",
+        )
+
+        while not self.cli_piece_segment_reset.wait_for_service(timeout_sec=2.0):
+            self.get_logger().warn(
+                f"Service {self.cli_piece_segment_reset.srv_name} not available, waiting again"
+            )
+
+        while not self.cli_piece_detection_reset.wait_for_service(timeout_sec=2.0):
+            self.get_logger().warn(
+                f"Service {self.cli_piece_detection_reset.srv_name} not available, waiting again"
+            )
+
+        while not self.cli_piece_p2r_reset.wait_for_service(timeout_sec=2.0):
+            self.get_logger().warn(
+                f"Service {self.cli_piece_p2r_reset.srv_name} not available, waiting again"
+            )
+
+        while not self.cli_puzzle_segment_reset.wait_for_service(timeout_sec=2.0):
+            self.get_logger().warn(
+                f"Service {self.cli_puzzle_segment_reset.srv_name} not available, waiting again"
+            )
+
+        while not self.cli_puzzle_solver_reset.wait_for_service(timeout_sec=2.0):
+            self.get_logger().warn(
+                f"Service {self.cli_puzzle_solver_reset.srv_name} not available, waiting again"
+            )
+
     def sub_robot_action_callback(self, msg: RobotAction):
         self.robot_action = msg
 
@@ -84,6 +139,40 @@ class ActionExecutor(Node):
             speech.play()
 
             self.actions_ready = True
+
+    async def srv_reset_callback(
+        self,
+        request: Trigger_Request,
+        response: Trigger_Response,
+    ):
+        self.get_logger().info("Resetting the system")
+
+        future: Future = None
+        req = Trigger.Request()
+
+        future = self.cli_piece_segment_reset.call_async(req)
+        await future
+
+        future = self.cli_piece_detection_reset.call_async(req)
+        await future
+
+        future = self.cli_piece_p2r_reset.call_async(req)
+        await future
+
+        future = self.cli_puzzle_segment_reset.call_async(req)
+        await future
+
+        future = self.cli_puzzle_solver_reset.call_async(req)
+        await future
+
+        response.success = True
+        return response
+
+    def srv_ready_callback(self, request: Trigger_Request, response: Trigger_Response):
+        self.calibration_ready = True
+
+        response.success = True
+        return response
 
     def action_execute_action_goal_callback(self, request):
         self.get_logger().info(f"Received goal request: {request}")
@@ -114,6 +203,12 @@ class ActionExecutor(Node):
 
             return self.get_fail_result(goal_handle)
 
+        if not self.calibration_ready:
+            speech = Speech("Not calibrated yet, please wait", "en")
+            speech.play()
+
+            return self.get_fail_result(goal_handle)
+
         self.get_logger().info("Starting execution")
 
         speech = Speech(f"Start solving puzzle", "en")
@@ -132,7 +227,7 @@ class ActionExecutor(Node):
             place_x = action.place.x
             place_y = action.place.y
 
-            motion = 1
+            # motion = 1
 
             shape_name = get_shape_name(action.shape)
             speech = Speech(f"Picking {shape_name}", "en")
@@ -140,38 +235,38 @@ class ActionExecutor(Node):
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.move_arm(pick_x, pick_y, self.z_standoff, pick=True)
+            self.publish_status(f"Stage {stage} --> Pick standoff", goal_handle)
+            # motion += 1
 
             # time.sleep(0.5)
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.grasp()
+            self.publish_status(f"Stage {stage} --> Grasp", goal_handle)
+            # motion += 1
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.move_arm(pick_x, pick_y, self.z_down, pick=True)
+            self.publish_status(f"Stage {stage} --> Pick object", goal_handle)
+            # motion += 1
 
             # time.sleep(0.5)
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.move_arm(pick_x, pick_y, self.z_standoff, pick=True)
+            self.publish_status(f"Stage {stage} --> Pick standoff", goal_handle)
+            # motion += 1
 
             # time.sleep(0.5)
 
-            if self.cancel_requested:
-                return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
-            self.commander.go_home()
+            # if self.cancel_requested:
+            #     return self.get_cancel_result(goal_handle)
+            # self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
+            # # motion += 1
+            # self.commander.go_home()
 
             # time.sleep(0.5)
             speech = Speech(f"Placing {shape_name}", "en")
@@ -179,42 +274,38 @@ class ActionExecutor(Node):
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.move_arm(place_x, place_y, self.z_standoff, pick=False)
+            self.publish_status(f"Stage {stage} --> Place standoff", goal_handle)
+            # motion += 1
 
             # time.sleep(0.5)
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.move_arm(place_x, place_y, self.z_down, pick=False)
+            self.publish_status(f"Stage {stage} --> Place object", goal_handle)
+            # motion += 1
 
             # time.sleep(0.5)
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.release()
+            self.publish_status(f"Stage {stage} --> Release", goal_handle)
+            # motion += 1
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
             self.commander.move_arm(place_x, place_y, self.z_standoff, pick=False)
-
-            # time.sleep(0.5)
-
-            if self.cancel_requested:
-                return self.get_cancel_result(goal_handle)
-            self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            motion += 1
-            self.commander.go_home()
-
-            # time.sleep(0.5)
+            self.publish_status(f"Stage {stage} --> Place object", goal_handle)
+            # motion += 1
 
             stage += 1
+
+        if self.cancel_requested:
+            return self.get_cancel_result(goal_handle)
+        self.commander.go_home()
+        self.publish_status("Final --> Going home", goal_handle)
+        # motion += 1
 
         speech = Speech("Finished solving puzzle", "en")
         speech.play()
@@ -276,7 +367,11 @@ class ActionExecutor(Node):
         self.status = status
 
         feedback = ExecuteAction.Feedback()
-        feedback.state = status
+        feedback.status = status
+        feedback.x = self.commander.x
+        feedback.y = self.commander.y
+        feedback.z = self.commander.z
+
         self.get_logger().info(f"In state: {status}")
         goal_handle.publish_feedback(feedback)
 

@@ -1,5 +1,6 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
@@ -9,12 +10,30 @@ package_name = "image_segmentation"
 
 
 def generate_launch_description():
-    # arg_live = DeclareLaunchArgument(
-    #     name="live",
-    #     default_value="true",
-    #     choices=["true", "false"],
-    #     description="If use live model prediction or use pre-saved the snapshot",
-    # )
+    arg_stream = DeclareLaunchArgument(
+        name="stream",
+        default_value="true",
+        choices=["true", "false"],
+        description="Whether to stream the video",
+    )
+
+    include_realsense = IncludeLaunchDescription(
+        launch_description_source=PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("realsense2_camera"),
+                    "launch",
+                    "rs_launch.py",
+                ]
+            )
+        ),
+        launch_arguments={
+            "camera_namespace": "piece",
+            "pointcloud.enable": "true",
+            "align_depth.enable": "true",
+            "serial_no": "_243522073414",
+        }.items(),
+    )
 
     node_segment = Node(
         package=package_name,
@@ -39,10 +58,13 @@ def generate_launch_description():
         package="web_video_server",
         executable="web_video_server",
         name="web_video_server",
+        condition=IfCondition(LaunchConfiguration("stream")),
     )
 
     return LaunchDescription(
         [
+            arg_stream,
+            include_realsense,
             node_segment,
             node_video_server,
         ]

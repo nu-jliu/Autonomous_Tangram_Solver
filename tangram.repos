@@ -1,0 +1,9 @@
+repositories:
+  Autonomous_Tangram_Solver:
+    type: git
+    url: git@github.com:nu-jliu/Autonomous_Tangram_Solver.git
+    version: main
+  uuid_v4:
+    type: git
+    url: https://github.com/crashoz/uuid_v4.git
+    version: master

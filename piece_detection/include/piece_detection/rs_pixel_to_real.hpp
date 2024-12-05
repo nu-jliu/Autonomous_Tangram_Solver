@@ -1,9 +1,11 @@
 #ifndef PIECE_DETECTION__RS_PIXEL_TO_REAL_HPP___
 #define PIECE_DETECTION__RS_PIXEL_TO_REAL_HPP___
 
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
 
 #include <tf2_ros/transform_broadcaster.h>
+
+#include <std_srvs/srv/trigger.hpp>
 
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
@@ -22,6 +24,8 @@ public:
 
 private:
   rclcpp::TimerBase::SharedPtr timer_;
+
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_reset_;
 
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_aligned_depth_;
   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_camera_info_;
@@ -47,11 +51,16 @@ private:
 
   void timer_callback_();
 
-  void sub_image_aligned_depth_callback_(sensor_msgs::msg::Image::SharedPtr msg);
+  void srv_reset_callback_(
+    const std_srvs::srv::Trigger::Request::SharedPtr request,
+    std_srvs::srv::Trigger::Response::SharedPtr response
+  );
 
-  void sub_camera_info_callback_(sensor_msgs::msg::CameraInfo::SharedPtr msg);
+  void sub_image_aligned_depth_callback_(const sensor_msgs::msg::Image::SharedPtr msg);
 
-  void sub_tangram_pieces_pixel_callback_(tangram_msgs::msg::TangramPieces::SharedPtr msg);
+  void sub_camera_info_callback_(const sensor_msgs::msg::CameraInfo::SharedPtr msg);
+
+  void sub_tangram_pieces_pixel_callback_(const tangram_msgs::msg::TangramPieces::SharedPtr msg);
 };
 }  // namespace piece_detection
 #endif  // PIECE_DETECTION__RS_PIXEL_TO_REAL_HPP___

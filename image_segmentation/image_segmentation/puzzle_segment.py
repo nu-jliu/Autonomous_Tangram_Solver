@@ -3,6 +3,7 @@
 import os
 import numpy as np
 
+import gc
 import torch
 from torchvision import transforms
 
@@ -15,10 +16,13 @@ from rclpy.node import Node
 
 from cv_bridge import CvBridge
 
-from rcl_interfaces.msg import ParameterDescriptor
-import rclpy.node
 from tangram_msgs.srv import SetTarget, SetTarget_Request, SetTarget_Response
+from std_srvs.srv import Trigger, Trigger_Request, Trigger_Response
+
+from rcl_interfaces.msg import ParameterDescriptor
 from sensor_msgs.msg import Image
+from tangram_msgs.msg import PuzzleShape
+
 
 from google_speech import Speech
 
@@ -26,6 +30,9 @@ from google_speech import Speech
 class PuzzleSegment(Node):
 
     def __init__(self) -> None:
+        gc.collect()
+        torch.cuda.empty_cache()
+
         super().__init__("puzzle_segment")
 
         self.declare_parameter(
@@ -60,6 +67,7 @@ class PuzzleSegment(Node):
         self.model.to(self.device)
         self.get_logger().info(f"Finished moding model")
 
+        self.current_shape = ""
         self.input_tensor = None
         self.origin_array = None
         self.input_ready = False
@@ -75,10 +83,23 @@ class PuzzleSegment(Node):
         )
 
         self.timer = self.create_timer(0.1, self.timer_callback)
+
+        self.sub_puzzle_shape = self.create_subscription(
+            PuzzleShape,
+            "puzzle/shape",
+            self.sub_puzzle_shape_callback,
+            10,
+        )
+
         self.srv_set_target = self.create_service(
             SetTarget,
             "set_target",
             self.srv_set_target_callback,
+        )
+        self.srv_reset = self.create_service(
+            Trigger,
+            "puzzle/segment/reset",
+            self.srv_reset_callback,
         )
 
         self.pub_image_target = self.create_publisher(
@@ -124,6 +145,48 @@ class PuzzleSegment(Node):
                 encoding="mono8",
             )
             self.pub_image_target.publish(origin_image_msg)
+
+    def sub_puzzle_shape_callback(self, msg: PuzzleShape):
+        shape = msg.shape
+        target_path = os.path.join(self.image_dir, f"{shape}.png")
+
+        if shape != self.current_shape:
+            try:
+                image = PIL_Image.open(target_path).convert("L")
+                tensor = self.transform(image).unsqueeze(0)
+                tensor = (tensor > 0.5).float()
+
+                # speech = Speech(f"Received input: {target_name}", "en")
+                # speech.play()
+
+                self.origin_array = tensor.squeeze(0).cpu().numpy()
+                self.origin_array = (self.origin_array * 255).astype(np.uint8)
+
+                if self.origin_array.ndim > 2:
+                    self.origin_array = self.origin_array[0]
+
+                self.input_tensor = tensor.to(self.device)
+                self.input_ready = True
+                self.current_shape = shape
+
+                self.get_logger().info(f"Target shape set to {shape} successfully")
+
+                # response.success = True
+                # return response
+            except FileNotFoundError:
+                self.get_logger().error(f"File for target {shape} not found")
+
+                # response.success = False
+                # return response
+
+    def srv_reset_callback(self, request: Trigger_Request, response: Trigger_Response):
+        self.get_logger().info("Node resetted")
+
+        self.input_tensor = None
+        self.input_ready = False
+
+        response.success = True
+        return response
 
     def srv_set_target_callback(
         self,

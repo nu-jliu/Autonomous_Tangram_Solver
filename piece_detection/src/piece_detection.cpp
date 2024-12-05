@@ -23,35 +23,43 @@ PieceDetection::PieceDetection()
 {
   timer_ = create_wall_timer(0.01s, std::bind(&PieceDetection::timer_callback_, this));
 
-  sub_image_piece_segment_ = create_subscription<sensor_msgs::msg::Image>(
+  srv_reset_ = create_service<std_srvs::srv::Trigger>(
+    "piece/detection/reset",
+    std::bind(
+      &PieceDetection::srv_reset_callback_,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2
+    )
+  );
+
+  sub_image_segment_ = create_subscription<sensor_msgs::msg::Image>(
     "image/piece/segment",
     10,
     std::bind(
-      &PieceDetection::sub_image_piece_segment_callback_,
+      &PieceDetection::sub_image_segment_callback_,
       this,
       std::placeholders::_1
   ));
-  sub_image_piece_mask_ = create_subscription<sensor_msgs::msg::Image>(
+  sub_image_mask_ = create_subscription<sensor_msgs::msg::Image>(
     "image/piece/mask",
     10,
     std::bind(
-      &PieceDetection::sub_image_piece_mask_callback_,
+      &PieceDetection::sub_image_mask_callback_,
       this,
       std::placeholders::_1
   ));
 
-  pub_image_piece_edges_ = create_publisher<sensor_msgs::msg::Image>(
-    "image/piece/edges",
-    10
-  );
-  pub_image_piece_contour_raw_ = create_publisher<sensor_msgs::msg::Image>(
-    "image/piece/contour/raw",
-    10
-  );
-  pub_image_piece_contour_labeled_ = create_publisher<sensor_msgs::msg::Image>(
+  pub_image_erodes_ = create_publisher<sensor_msgs::msg::Image>("image/piece/erodes", 10);
+  pub_image_opened_ = create_publisher<sensor_msgs::msg::Image>("image/piece/opened", 10);
+  pub_image_closed_ = create_publisher<sensor_msgs::msg::Image>("image/piece/closed", 10);
+  pub_image_edges_ = create_publisher<sensor_msgs::msg::Image>("image/piece/edges", 10);
+  pub_image_contour_raw_ = create_publisher<sensor_msgs::msg::Image>("image/piece/contour/raw", 10);
+  pub_image_contour_labeled_ = create_publisher<sensor_msgs::msg::Image>(
     "image/piece/contour/labeled",
     10
   );
+
   pub_piece_pixels_ = create_publisher<tangram_msgs::msg::TangramPieces>(
     "pick/pixel",
     10
@@ -63,18 +71,26 @@ void PieceDetection::timer_callback_()
   if (segment_ready_ && mask_ready_) {
 
     try {
-
-      // Do something
       const int row_size = image_segment_.rows;
 
-      cv::Mat img_edges, img_contours, img_labeled;
+      cv::Mat img_erode, img_opened, img_closed, img_edges, img_contours, img_labeled;
       tangram_msgs::msg::TangramPieces pieces_msg;
+
+      const int kernelSize = 3; // Size of the structuring element
+      const cv::Mat kernel = cv::getStructuringElement(
+        cv::MORPH_RECT,
+        cv::Size(kernelSize, kernelSize)
+      );
+
+      cv::erode(image_mask_, img_erode, kernel, cv::Point(-1, -1), 3);
+      cv::morphologyEx(img_erode, img_opened, cv::MORPH_OPEN, kernel);
+      cv::morphologyEx(img_opened, img_closed, cv::MORPH_CLOSE, kernel);
 
       // Perform Canny edge detection
       const double threshold_low = 50.0;
       const double threshold_high = 150.0;
       // int kernelSize = 3;   // Kernel size for the Sobel operator
-      cv::Canny(image_mask_, img_edges, threshold_low, threshold_high);
+      cv::Canny(img_closed, img_edges, threshold_low, threshold_high);
 
       img_contours = cv::Mat::zeros(image_mask_.size(), CV_8UC3);
       img_labeled = cv::Mat::zeros(image_mask_.size(), CV_8UC3);
@@ -92,7 +108,7 @@ void PieceDetection::timer_callback_()
           rng_.uniform(low, high)
         );
 
-        cv::drawContours(img_contours, contours, static_cast<int>(i), color, i);
+        cv::drawContours(img_contours, contours, static_cast<int>(i), color, 1);
       }
 
       std::vector<size_t> shapes;
@@ -207,42 +223,81 @@ void PieceDetection::timer_callback_()
         }
       }
 
-      if (!tangram_utils::validate_pieces(shapes)) {
-        RCLCPP_WARN_ONCE(get_logger(), "Invalid shapes");
-        return;
-      }
+
+      const auto image_erodes = cv_bridge::CvImage(
+        std_msgs::msg::Header(),
+        sensor_msgs::image_encodings::MONO8,
+        img_erode
+      ).toImageMsg();
+      pub_image_erodes_->publish(*image_erodes);
+
+      const auto image_opened = cv_bridge::CvImage(
+        std_msgs::msg::Header(),
+        sensor_msgs::image_encodings::MONO8,
+        img_opened
+      ).toImageMsg();
+      pub_image_opened_->publish(*image_opened);
+
+      const auto image_closed = cv_bridge::CvImage(
+        std_msgs::msg::Header(),
+        sensor_msgs::image_encodings::MONO8,
+        img_closed
+      ).toImageMsg();
+      pub_image_closed_->publish(*image_closed);
 
       const auto image_edges = cv_bridge::CvImage(
         std_msgs::msg::Header(),
         sensor_msgs::image_encodings::MONO8,
         img_edges
       ).toImageMsg();
-      pub_image_piece_edges_->publish(*image_edges);
+      pub_image_edges_->publish(*image_edges);
 
       const auto image_contour_raw = cv_bridge::CvImage(
         std_msgs::msg::Header(),
         sensor_msgs::image_encodings::BGR8,
         img_contours
       ).toImageMsg();
-      pub_image_piece_contour_raw_->publish(*image_contour_raw);
+      pub_image_contour_raw_->publish(*image_contour_raw);
 
       const auto image_contour_labeled = cv_bridge::CvImage(
         std_msgs::msg::Header(),
         sensor_msgs::image_encodings::BGR8,
         img_labeled
       ).toImageMsg();
-      pub_image_piece_contour_labeled_->publish(*image_contour_labeled);
+      pub_image_contour_labeled_->publish(*image_contour_labeled);
+
+      if (!tangram_utils::validate_pieces(shapes)) {
+        RCLCPP_WARN_ONCE(get_logger(), "Invalid shapes");
+        return;
+      }
 
       pub_piece_pixels_->publish(pieces_msg);
     } catch (std::exception & e) {
-      RCLCPP_ERROR_STREAM_ONCE(get_logger(), "Got exception " << e.what());
+      RCLCPP_ERROR_STREAM_ONCE(
+        get_logger(),
+        "Got exception on line " << __LINE__ << ": " << e.what()
+      );
     }
   } else {
     RCLCPP_WARN_STREAM_ONCE(get_logger(), "Segmented or mask image not ready yet");
   }
 }
 
-void PieceDetection::sub_image_piece_segment_callback_(sensor_msgs::msg::Image::SharedPtr msg)
+void PieceDetection::srv_reset_callback_(
+  const std_srvs::srv::Trigger::Request::SharedPtr request,
+  std_srvs::srv::Trigger::Response::SharedPtr response
+)
+{
+  (void) request;
+
+  segment_ready_ = false;
+  mask_ready_ = false;
+
+  RCLCPP_INFO(get_logger(), "Node resetted");
+  response->success = true;
+}
+
+void PieceDetection::sub_image_segment_callback_(const sensor_msgs::msg::Image::SharedPtr msg)
 {
   RCLCPP_INFO(get_logger(), "Received segmented image");
 
@@ -261,10 +316,11 @@ void PieceDetection::sub_image_piece_segment_callback_(sensor_msgs::msg::Image::
   }
 }
 
-void PieceDetection::sub_image_piece_mask_callback_(sensor_msgs::msg::Image::SharedPtr msg)
+void PieceDetection::sub_image_mask_callback_(const sensor_msgs::msg::Image::SharedPtr msg)
 {
-  cv::Mat image_mask_raw, image_mask_resized;
   RCLCPP_INFO(get_logger(), "Received mask image");
+
+  cv::Mat image_mask_raw, image_mask_resized;
   cv_bridge::CvImage::Ptr cv_image_ptr = cv_bridge::toCvCopy(
     msg,
     sensor_msgs::image_encodings::MONO8

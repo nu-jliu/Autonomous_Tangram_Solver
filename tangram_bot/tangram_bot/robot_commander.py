@@ -6,6 +6,8 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from tangram_msgs.action import MoveArm, GoHome
 from std_srvs.srv import Trigger
 
+import random
+
 
 class RobotCommander:
 
@@ -13,7 +15,11 @@ class RobotCommander:
         if not rclpy.ok():
             rclpy.init()
 
-        self.node = rclpy.create_node("robot_commander")
+        self.x = 0.0
+        self.y = 0.0
+        self.z = 0.0
+
+        self.node = rclpy.create_node(f"robot_commander_{random.randint(0, 255)}")
         self.callback_group = ReentrantCallbackGroup()
 
         self.cli_action_move_arm = ActionClient(
@@ -57,12 +63,20 @@ class RobotCommander:
         rclpy.try_shutdown()
 
     def move_arm(self, x: float, y: float, z: float, pick: bool = False):
+        self.node.get_logger().info(
+            f"Sending request for robot arm to move to {x, y, z}"
+        )
+
         future: Future = None
         goal = MoveArm.Goal()
         goal.goal.x = x
         goal.goal.y = y
         goal.goal.z = z
         goal.pick = pick
+
+        self.x = x
+        self.y = y
+        self.z = z
 
         future = self.cli_action_move_arm.send_goal_async(goal)
         rclpy.spin_until_future_complete(self.node, future)
@@ -73,6 +87,8 @@ class RobotCommander:
         return future.result()
 
     def go_home(self):
+        self.node.get_logger().info("Sending request to home robot arm")
+
         future: Future = None
         goal = GoHome.Goal()
 
@@ -85,6 +101,8 @@ class RobotCommander:
         return future.result()
 
     def grasp(self):
+        self.node.get_logger().info(f"Sending request to grasp")
+
         future: Future = None
         request = Trigger.Request()
 
@@ -94,6 +112,8 @@ class RobotCommander:
         return future.result()
 
     def release(self):
+        self.node.get_logger().info("Sending request to release")
+
         future: Future = None
         request = Trigger.Request()
 

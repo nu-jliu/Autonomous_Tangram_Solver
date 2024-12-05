@@ -27,24 +27,51 @@ def generate_launch_description():
         choices=["true", "false"],
         description="Whether to use rviz to visualize",
     )
+    arg_debug = DeclareLaunchArgument(
+        name="debug",
+        default_value="false",
+        choices=["true", "false"],
+        description="Whether to attach debugger",
+    )
+
+    node_video_server = Node(
+        package="web_video_server",
+        executable="web_video_server",
+        name="web_video_server",
+        condition=IfCondition(LaunchConfiguration("stream")),
+    )
+
+    # include_realsense = IncludeLaunchDescription(
+    #     launch_description_source=PythonLaunchDescriptionSource(
+    #         PathJoinSubstitution(
+    #             [
+    #                 FindPackageShare("realsense2_camera"),
+    #                 "launch",
+    #                 "rs_launch.py",
+    #             ]
+    #         )
+    #     ),
+    #     launch_arguments={
+    #         "camera_namespace": "piece",
+    #         "pointcloud.enable": "true",
+    #         "align_depth.enable": "true",
+    #         "serial_no": "_243522073414",
+    #     }.items(),
+    # )
 
     package_segment = "image_segmentation"
 
-    include_realsense = IncludeLaunchDescription(
+    include_segmentation = IncludeLaunchDescription(
         launch_description_source=PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("realsense2_camera"),
+                    FindPackageShare(package_segment),
                     "launch",
-                    "rs_launch.py",
+                    "segmentation.launch.py",
                 ]
             )
         ),
-        launch_arguments={
-            "pointcloud.enable": "true",
-            "align_depth.enable": "true",
-            "serial_no": "_243522073414",
-        }.items(),
+        launch_arguments={"stream": "false"}.items(),
     )
 
     node_rs_model = Node(
@@ -72,24 +99,24 @@ def generate_launch_description():
         ],
     )
 
-    node_segment = Node(
-        package=package_segment,
-        executable="piece_segment",
-        name="piece_segment",
-        parameters=[
-            {
-                "model_dir": PathJoinSubstitution(
-                    [
-                        FindPackageShare(package_segment),
-                        "model",
-                    ]
-                ),
-                "model_file": "sam2.1_hiera_large.pt",
-                "model_cfg": "configs/sam2.1/sam2.1_hiera_l.yaml",
-            }
-        ],
-        # condition=UnlessCondition(LaunchConfiguration("live")),
-    )
+    # node_segment = Node(
+    #     package=package_segment,
+    #     executable="piece_segment",
+    #     name="piece_segment",
+    #     parameters=[
+    #         {
+    #             "model_dir": PathJoinSubstitution(
+    #                 [
+    #                     FindPackageShare(package_segment),
+    #                     "model",
+    #                 ]
+    #             ),
+    #             "model_file": "sam2.1_hiera_large.pt",
+    #             "model_cfg": "configs/sam2.1/sam2.1_hiera_l.yaml",
+    #         }
+    #     ],
+    #     # condition=UnlessCondition(LaunchConfiguration("live")),
+    # )
 
     node_detection = Node(
         package=package_name,
@@ -101,13 +128,15 @@ def generate_launch_description():
         package=package_name,
         executable="rs_pixel_to_real",
         name="rs_pixel_to_real",
+        condition=UnlessCondition(LaunchConfiguration("debug")),
     )
 
-    node_video_server = Node(
-        package="web_video_server",
-        executable="web_video_server",
-        name="web_video_server",
-        condition=IfCondition(LaunchConfiguration("stream")),
+    node_pixel_to_real_debug = Node(
+        package=package_name,
+        executable="rs_pixel_to_real",
+        name="rs_pixel_to_real",
+        prefix=["gdbserver :10000"],
+        condition=IfCondition(LaunchConfiguration("debug")),
     )
 
     node_rviz = Node(
@@ -131,12 +160,14 @@ def generate_launch_description():
         [
             arg_stream,
             arg_use_rviz,
-            include_realsense,
+            arg_debug,
+            node_video_server,
+            include_segmentation,
             node_rs_model,
-            node_segment,
+            # node_segment,
             node_detection,
             node_pixel_to_real,
-            node_video_server,
+            node_pixel_to_real_debug,
             node_rviz,
         ]
     )

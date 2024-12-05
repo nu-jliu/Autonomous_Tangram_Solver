@@ -15,21 +15,22 @@ package_name = "tangram_bot"
 
 
 def generate_launch_description():
-    include_realsense = IncludeLaunchDescription(
-        launch_description_source=PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("realsense2_camera"),
-                    "launch",
-                    "rs_launch.py",
-                ]
-            )
-        ),
-        launch_arguments={
-            "camera_namespace": "stream",
-            "serial_no": "_141722071471",
-        }.items(),
-    )
+    # include_realsense = IncludeLaunchDescription(
+    #     launch_description_source=PythonLaunchDescriptionSource(
+    #         PathJoinSubstitution(
+    #             [
+    #                 FindPackageShare("realsense2_camera"),
+    #                 "launch",
+    #                 "rs_launch.py",
+    #             ]
+    #         )
+    #     ),
+    #     launch_arguments={
+    #         "camera_namespace": "puzzle",
+    #         "serial_no": "_141722071471",
+    #         "publish_tf": "false",
+    #     }.items(),
+    # )
 
     include_solver = IncludeLaunchDescription(
         launch_description_source=PythonLaunchDescriptionSource(
@@ -71,6 +72,23 @@ def generate_launch_description():
             )
         ),
         # launch_arguments={"stream": "false"}.items(),
+    )
+
+    include_calibration = IncludeLaunchDescription(
+        launch_description_source=PythonLaunchDescriptionSource(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("hand_eye_calibration"),
+                    "launch",
+                    "calibrate.launch.py",
+                ]
+            )
+        ),
+        launch_arguments={
+            "use_rviz": "false",
+            "launch_rs": "false",
+            "launch_robot": "false",
+        }.items(),
     )
 
     node_generator = Node(
@@ -119,6 +137,7 @@ def generate_launch_description():
             include_solver,
             include_detector,
             include_controller,
+            include_calibration,
             node_generator,
             node_executor,
             node_rviz,

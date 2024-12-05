@@ -12,16 +12,19 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+#include <std_srvs/srv/trigger.hpp>
+
 namespace puzzle_solver
 {
-class TangramSolver : public rclcpp::Node
+class PuzzleSolver : public rclcpp::Node
 {
 public:
-  TangramSolver();
-  ~TangramSolver();
+  PuzzleSolver();
 
 private:
   rclcpp::TimerBase::SharedPtr timer_;
+
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr srv_reset_;
 
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_image_inferenced_;
 
@@ -44,6 +47,11 @@ private:
   cv::Mat target_img_;
 
   void timer_callback_();
+
+  void srv_reset_callback_(
+    const std_srvs::srv::Trigger::Request::SharedPtr request,
+    std_srvs::srv::Trigger::Response::SharedPtr response
+  );
 
   void sub_tangram_image_inferenced_callback_(sensor_msgs::msg::Image::SharedPtr msg);
 };

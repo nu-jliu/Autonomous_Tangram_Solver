@@ -40,7 +40,7 @@ RobotControl::RobotControl()
 
   go_home_();
   nozzle_off_();
-  run_buzzer_();
+  // run_buzzer_();
 
   srv_grasp_ = create_service<std_srvs::srv::Trigger>(
     "gripper/grasp",
@@ -228,7 +228,15 @@ void RobotControl::action_move_arm_execute_callback_(
   ss_arm << "), 1200)\r\n";
 
   arm_serial_port_->Write(ss_arm.str());
-  wait_for_data_();
+  const bool success = wait_for_data_();
+
+  if (rclcpp::ok() & !success) {
+    result->success = success;
+    goal_handle->abort(result);
+
+    RCLCPP_ERROR(get_logger(), "MaxArm moving failed");
+    return;
+  }
 
   const double radian = std::atan2(-x, -y);
 
@@ -248,7 +256,7 @@ void RobotControl::action_move_arm_execute_callback_(
   std::this_thread::sleep_for(1.5s);
 
   if (rclcpp::ok()) {
-    result->success = true;
+    result->success = success;
     goal_handle->succeed(result);
 
     RCLCPP_INFO_STREAM(get_logger(), "MaxArm moved to " << x << ", " << y << ", " << z);
@@ -339,7 +347,7 @@ void RobotControl::go_home_()
   std::this_thread::sleep_for(1s);
 }
 
-void RobotControl::wait_for_data_()
+bool RobotControl::wait_for_data_()
 {
   while (rclcpp::ok()) {
     if (arm_serial_port_->Available() > 0) {
@@ -356,7 +364,20 @@ void RobotControl::wait_for_data_()
   std::string response_message;
   arm_serial_port_->Read(response_message);
 
-  RCLCPP_INFO_STREAM(get_logger(), "Received response: " << response_message);
+  std::istringstream ss_response(response_message);
+  std::string line;
+
+  bool success = false;
+
+  // RCLCPP_INFO(get_logger(), "Received response:");
+  while (std::getline(ss_response, line)) {
+    RCLCPP_INFO_STREAM(get_logger(), line);
+    if (line.substr(0, 4) == "True") {
+      success = true;
+    }
+  }
+
+  return success;
 }
 
 void RobotControl::run_buzzer_()

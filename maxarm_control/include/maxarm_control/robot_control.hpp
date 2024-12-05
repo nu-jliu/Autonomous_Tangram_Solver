@@ -130,7 +130,8 @@ private:
   const std::string get_uuid_string(const rclcpp_action::GoalUUID & uuid);
 
   /// \brief Wait until data is available
-  void wait_for_data_();
+  /// \return If the action is success
+  bool wait_for_data_();
 
   /// \brief Move the robot arm to home position
   void go_home_();

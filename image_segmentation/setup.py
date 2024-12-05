@@ -28,8 +28,10 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
+            f"webcam = {package_name}.webcam:main",
             f"puzzle_segment = {package_name}.puzzle_segment:main",
             f"piece_segment = {package_name}.piece_segment:main",
+            f"shape_classify = {package_name}.shape_classify:main",
         ],
     },
 )

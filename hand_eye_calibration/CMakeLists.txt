@@ -9,13 +9,45 @@ endif()
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(rcl_interfaces REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(tangram_msgs REQUIRED)
+
+add_executable(calibrate src/calibrate.cpp)
+target_include_directories(calibrate PRIVATE include)
+ament_target_dependencies(calibrate 
+  rclcpp
+  tf2
+  tf2_ros
+  rcl_interfaces
+  std_srvs
+  tangram_msgs
+)
+
+install(TARGETS 
+  calibrate
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY include/
+  DESTINATION include
+)
 
 install(DIRECTORY 
   launch
   config
   image
   DESTINATION share/${PROJECT_NAME}
+)
+
+ament_python_install_package(${PROJECT_NAME})
+
+install(PROGRAMS
+  ${PROJECT_NAME}/scan_apriltag.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

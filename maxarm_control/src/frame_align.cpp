@@ -11,7 +11,7 @@
 namespace maxarm_control
 {
 FrameAlign::FrameAlign()
-: rclcpp::Node("frame_align")
+: rclcpp::Node("frame_align"), apriltag_ready_(false)
 {
   rcl_interfaces::msg::ParameterDescriptor rt_r00_des;
   rcl_interfaces::msg::ParameterDescriptor rt_r01_des;
@@ -77,9 +77,7 @@ FrameAlign::FrameAlign()
     {0.0, 0.0, 1.0}
   };
 
-
-  T_robot_camera_ = T_robot_tag_ * trans_inv_(T_camera_tag_);
-  RCLCPP_INFO_STREAM(get_logger(), T_robot_camera_);
+  update_transform_();
 
   sub_pieces_pose_cam_ = create_subscription<tangram_msgs::msg::TangramPoses>(
     "pick/camera",
@@ -90,38 +88,64 @@ FrameAlign::FrameAlign()
       std::placeholders::_1
     )
   );
+  sub_apriltag_saved_ = create_subscription<tangram_msgs::msg::Point2D>(
+    "april/saved",
+    10,
+    std::bind(
+      &FrameAlign::sub_apriltag_saved_callback_,
+      this,
+      std::placeholders::_1
+    )
+  );
 
   pub_pieces_pose_robot_ = create_publisher<tangram_msgs::msg::TangramPoses>("pick/robot", 10);
 }
 
-void FrameAlign::sub_pieces_pos_cam_callback_(tangram_msgs::msg::TangramPoses::SharedPtr msg)
+void FrameAlign::sub_pieces_pos_cam_callback_(const tangram_msgs::msg::TangramPoses::SharedPtr msg)
 {
-  tangram_msgs::msg::TangramPoses msg_poses_robot;
+  if (apriltag_ready_) {
+    tangram_msgs::msg::TangramPoses msg_poses_robot;
 
-  for (const auto & p : msg->poses) {
-    const double x_cam = p.location.x;
-    const double y_cam = p.location.y;
+    for (const auto & p : msg->poses) {
+      const double x_cam = p.location.x;
+      const double y_cam = p.location.y;
 
-    const arma::colvec3 pvec_cam{x_cam, y_cam, 1.0};
-    const arma::colvec3 pvev_robot = T_robot_camera_ * pvec_cam;
+      const arma::colvec3 pvec_cam{x_cam, y_cam, 1.0};
+      const arma::colvec3 pvev_robot = T_robot_camera_ * pvec_cam;
 
-    const double x_robot = pvev_robot.at(0);
-    const double y_robot = pvev_robot.at(1);
+      const double x_robot = pvev_robot.at(0);
+      const double y_robot = pvev_robot.at(1);
 
-    tangram_msgs::msg::TangramPose pose;
+      tangram_msgs::msg::TangramPose pose;
 
-    pose.location.x = x_robot;
-    pose.location.y = y_robot;
+      pose.location.x = x_robot;
+      pose.location.y = y_robot;
 
-    // pose.contour = p.contour;
-    pose.type = p.type;
-    pose.theta = p.theta;
-    pose.uuid = p.uuid;
+      // pose.contour = p.contour;
+      pose.type = p.type;
+      pose.theta = p.theta;
+      pose.uuid = p.uuid;
 
-    msg_poses_robot.poses.push_back(pose);
+      msg_poses_robot.poses.push_back(pose);
+    }
+
+    pub_pieces_pose_robot_->publish(msg_poses_robot);
   }
+}
 
-  pub_pieces_pose_robot_->publish(msg_poses_robot);
+void FrameAlign::sub_apriltag_saved_callback_(const tangram_msgs::msg::Point2D::SharedPtr msg)
+{
+  if (!apriltag_ready_) {
+    const auto x = msg->x;
+    const auto y = msg->y;
+
+    T_camera_tag_.at(0, 2) = x;
+    T_camera_tag_.at(1, 2) = y;
+
+    update_transform_();
+
+    apriltag_ready_ = true;
+  }
 }
 
 arma::mat33 FrameAlign::trans_inv_(const arma::mat33 & T)
@@ -135,6 +159,12 @@ arma::mat33 FrameAlign::trans_inv_(const arma::mat33 & T)
 
   const arma::mat33 Tinv = arma::join_vert(upper, lower);
   return Tinv;
+}
+
+void FrameAlign::update_transform_()
+{
+  T_robot_camera_ = T_robot_camera_ = T_robot_tag_ * trans_inv_(T_camera_tag_);
+  RCLCPP_INFO_STREAM(get_logger(), "Trc = " << std::endl << T_robot_camera_);
 }
 } /// namespace maxarm_control
 

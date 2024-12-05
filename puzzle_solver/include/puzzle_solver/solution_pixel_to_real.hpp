@@ -6,6 +6,8 @@
 #include "tangram_msgs/msg/tangram_pieces.hpp"
 #include "tangram_msgs/msg/tangram_poses.hpp"
 
+#include <std_srvs/srv/trigger.hpp>
+
 namespace puzzle_solver
 {
 class SolutionPixelToReal : public rclcpp::Node

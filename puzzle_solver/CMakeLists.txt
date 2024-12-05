@@ -5,11 +5,14 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -31,6 +34,7 @@ target_link_libraries(puzzle_solver
 )
 ament_target_dependencies(puzzle_solver 
   rclcpp
+  std_srvs
   cv_bridge
   sensor_msgs
   tangram_msgs
@@ -44,6 +48,7 @@ target_link_libraries(tangram_publisher
 )
 ament_target_dependencies(tangram_publisher
   rclcpp
+  std_srvs
   cv_bridge
   sensor_msgs
   tangram_msgs
@@ -53,6 +58,7 @@ add_executable(solution_pixel_to_real src/solution_pixel_to_real.cpp)
 target_include_directories(solution_pixel_to_real PRIVATE include)
 ament_target_dependencies(solution_pixel_to_real 
   rclcpp 
+  std_srvs
   rcl_interfaces 
   tangram_msgs
 )
