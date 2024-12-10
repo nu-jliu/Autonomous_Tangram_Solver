@@ -9,6 +9,11 @@ DATA_DIR = os.path.join(FILE_DIR, "..", "dataset", "yolo_shapes")
 MODEL_DIR = os.path.join(FILE_DIR, "..", "model")
 
 
+rf = Roboflow(api_key="8CrldWKFJ6M2rJPp0f9f")
+project = rf.workspace("cell-fcwyr").project("shape-detection-tet2v")
+version = project.version(2)
+dataset = version.download("yolov11", location=DATA_DIR, overwrite=True)
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--num-epoch", default=1000000, help="Number of epochs")
@@ -20,10 +25,6 @@ if __name__ == "__main__":
     batch_size = 128 if args.lamb else 32
     model_name = args.model_name
 
-    rf = Roboflow(api_key="8CrldWKFJ6M2rJPp0f9f")
-    project = rf.workspace("cell-fcwyr").project("shape-detection-tet2v")
-    version = project.version(1)
-    dataset = version.download("yolov11", location=DATA_DIR, overwrite=True)
     # model = YOLO("yolo11n-cls.pt", task="classify", verbose=True)
     model = YOLO("yolo11n.pt", task="detect", verbose=True)
 

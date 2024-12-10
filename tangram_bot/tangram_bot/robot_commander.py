@@ -1,4 +1,5 @@
 import rclpy
+from rclpy.node import Node
 from rclpy.task import Future
 from rclpy.action import ActionClient
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -11,7 +12,7 @@ import random
 
 class RobotCommander:
 
-    def __init__(self):
+    def __init__(self, node: Node):
         if not rclpy.ok():
             rclpy.init()
 
@@ -19,7 +20,8 @@ class RobotCommander:
         self.y = 0.0
         self.z = 0.0
 
-        self.node = rclpy.create_node(f"robot_commander_{random.randint(0, 255)}")
+        # self.node = rclpy.create_node(f"robot_commander_{random.randint(0, 255)}")
+        self.node = node
         self.callback_group = ReentrantCallbackGroup()
 
         self.cli_action_move_arm = ActionClient(
@@ -58,11 +60,11 @@ class RobotCommander:
                 f"Action server {self.cli_action_go_home._action_name} not available, waiting again"
             )
 
-    def __del__(self):
-        self.node.destroy_node()
-        rclpy.try_shutdown()
+    # def __del__(self):
+    #     self.node.destroy_node()
+    #     rclpy.try_shutdown()
 
-    def move_arm(self, x: float, y: float, z: float, pick: bool = False):
+    async def move_arm(self, x: float, y: float, z: float, pick: bool = False):
         self.node.get_logger().info(
             f"Sending request for robot arm to move to {x, y, z}"
         )
@@ -79,45 +81,65 @@ class RobotCommander:
         self.z = z
 
         future = self.cli_action_move_arm.send_goal_async(goal)
-        rclpy.spin_until_future_complete(self.node, future)
+        await future
+        # rclpy.spin_until_future_complete(self.node, future)
 
         future = future.result().get_result_async()
-        rclpy.spin_until_future_complete(self.node, future)
+        await future
+        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()
 
-    def go_home(self):
+    async def move_offset(
+        self,
+        x_diff: float,
+        y_diff: float,
+        z_diff: float,
+        pick: bool = False,
+    ):
+        goal_x = self.x + x_diff
+        goal_y = self.y + y_diff
+        goal_z = self.z + z_diff
+
+        result = await self.move_arm(goal_x, goal_y, goal_z, pick)
+        return result
+
+    async def go_home(self):
         self.node.get_logger().info("Sending request to home robot arm")
 
         future: Future = None
         goal = GoHome.Goal()
 
         future = self.cli_action_go_home.send_goal_async(goal)
-        rclpy.spin_until_future_complete(self.node, future)
+        await future
+        # rclpy.spin_until_future_complete(self.node, future)
 
         future = future.result().get_result_async()
-        rclpy.spin_until_future_complete(self.node, future)
+        await future
+        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()
 
-    def grasp(self):
+    async def grasp(self):
         self.node.get_logger().info(f"Sending request to grasp")
 
         future: Future = None
         request = Trigger.Request()
 
         future = self.cli_grasp.call_async(request)
-        rclpy.spin_until_future_complete(self.node, future)
+        await future
+        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()
 
-    def release(self):
+    async def release(self):
         self.node.get_logger().info("Sending request to release")
 
         future: Future = None
         request = Trigger.Request()
 
         future = self.cli_release.call_async(request)
-        rclpy.spin_until_future_complete(self.node, future)
+        await future
+        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()

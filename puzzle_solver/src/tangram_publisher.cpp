@@ -25,12 +25,12 @@ TangramPublisher::TangramPublisher()
   declare_parameter<std::string>("image_dir", "", image_dir_des);
   declare_parameter<std::string>("image_name", "output_image.jpg", image_name_des);
 
-  std::string image_path = get_parameter("image_dir").as_string();
-  std::string image_name = get_parameter("image_name").as_string();
+  const std::string image_path = get_parameter("image_dir").as_string();
+  const std::string image_name = get_parameter("image_name").as_string();
 
-  boost::filesystem::path directory(image_path);
-  boost::filesystem::path filename(image_name);
-  boost::filesystem::path full_path = directory / filename;
+  const boost::filesystem::path directory(image_path);
+  const boost::filesystem::path filename(image_name);
+  const boost::filesystem::path full_path = directory / filename;
   image_full_path_ = full_path.string();
 
   timer_ = create_wall_timer(

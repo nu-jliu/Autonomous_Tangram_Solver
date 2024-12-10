@@ -29,6 +29,7 @@ private:
   rclcpp::Publisher<tangram_msgs::msg::Point2D>::SharedPtr pub_apriltag_saved_;
 
   bool apriltag_ready_;
+
   double px_curr_;
   double py_curr_;
   double px_saved_;

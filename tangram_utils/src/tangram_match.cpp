@@ -80,13 +80,49 @@ bool validate_pieces(const std::vector<size_t> & shapes)
   return true;
 }
 
-double get_ccw_angle(const cv::Point2d & v1, const cv::Point2d v2)
+double get_ccw_angle(const cv::Point2d & v1, const cv::Point2d & v2)
 {
   const double dot_product = v1.dot(v2);
   const double cross_product = v1.cross(v2);
 
   const double angle = std::atan2(cross_product, dot_product);
   return angle;
+}
+
+bool is_triangle_flipped(const std::vector<cv::Point> & contour)
+{
+  // std::cout << "Size: " << static_cast<int>(contour.size()) << std::endl;
+
+  double x_total = 0;
+  double y_total = 0;
+
+  for (const auto & point : contour) {
+    x_total += static_cast<double>(point.x);
+    y_total += static_cast<double>(point.y);
+  }
+
+  const int x_avg = static_cast<int>(x_total / static_cast<double>(contour.size()));
+  const int y_avg = static_cast<int>(y_total / static_cast<double>(contour.size()));
+
+  (void) x_avg;
+
+  const cv::Point center = find_center(contour);
+
+  return y_avg > center.y;
+}
+
+const cv::Point find_center(const std::vector<cv::Point> & contour)
+{
+  const cv::Moments m = cv::moments(contour);
+
+  if (m.m00 != 0) {
+    const int cx = static_cast<int>(m.m10 / m.m00);
+    const int cy = static_cast<int>(m.m01 / m.m00);
+
+    return cv::Point(cx, cy);
+  } else {
+    throw std::runtime_error("Invalid moment");
+  }
 }
 
 size_t find_closest_tangram_piece(const std::vector<cv::Point> & contour)

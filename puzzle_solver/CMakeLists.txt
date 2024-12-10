@@ -63,6 +63,31 @@ ament_target_dependencies(solution_pixel_to_real
   tangram_msgs
 )
 
+add_executable(svg_generator src/svg_generator.cpp)
+target_include_directories(svg_generator PRIVATE include)
+target_link_libraries(svg_generator
+  ${Boost_LIBRARIES}
+)
+ament_target_dependencies(svg_generator
+  rclcpp
+  std_srvs
+  rcl_interfaces
+  tangram_msgs
+)
+
+add_executable(web_camera src/web_camera.cpp)
+target_include_directories(web_camera PRIVATE include)
+target_link_libraries(web_camera
+  ${OpenCV_LIBS}
+  ${Boost_LIBRARIES}
+)
+ament_target_dependencies(web_camera
+  rclcpp
+  cv_bridge
+  rcl_interfaces
+  sensor_msgs
+)
+
 install(DIRECTORY include/
   DESTINATION include
 )
@@ -71,6 +96,8 @@ install(TARGETS
   puzzle_solver
   tangram_publisher
   solution_pixel_to_real
+  svg_generator
+  web_camera
   DESTINATION lib/${PROJECT_NAME}
 )
 

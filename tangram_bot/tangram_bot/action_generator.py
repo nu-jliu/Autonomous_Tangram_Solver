@@ -101,7 +101,11 @@ class ActionGenerator(Node):
 
                 for pick in pick_poses:
                     for i, place in enumerate(place_poses):
-                        if place.type == pick.type and i not in use_indecies:
+                        if (
+                            place.type == pick.type
+                            and pick.flipped == place.flipped
+                            and i not in use_indecies
+                        ):
                             actions.append((pick, place))
                             use_indecies.add(i)
 

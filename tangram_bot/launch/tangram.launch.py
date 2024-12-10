@@ -45,6 +45,21 @@ def generate_launch_description():
         launch_arguments={"stream": "false"}.items(),
     )
 
+    # include_scanner = IncludeLaunchDescription(
+    #     launch_description_source=PythonLaunchDescriptionSource(
+    #         PathJoinSubstitution(
+    #             [
+    #                 FindPackageShare("image_segmentation"),
+    #                 "launch",
+    #                 "detect.launch.py",
+    #             ]
+    #         )
+    #     ),
+    #     launch_arguments={
+    #         "stream": "false",
+    #     }.items(),
+    # )
+
     include_detector = IncludeLaunchDescription(
         launch_description_source=PythonLaunchDescriptionSource(
             PathJoinSubstitution(
@@ -102,10 +117,17 @@ def generate_launch_description():
         executable="action_executor",
         name="action_executor",
         parameters=[
-            {
-                "standoff": 0.12,
-                "object": 0.06,
-            }
+            # {
+            #     "standoff": 0.12,
+            #     "object": 0.06,
+            # }
+            PathJoinSubstitution(
+                [
+                    FindPackageShare(package_name),
+                    "config",
+                    "robot.yaml",
+                ]
+            )
         ],
     )
 
@@ -135,6 +157,7 @@ def generate_launch_description():
         [
             # include_realsense,
             include_solver,
+            # include_scanner,
             include_detector,
             include_controller,
             include_calibration,

@@ -1,12 +1,14 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.task import Future
 from rclpy.action import ActionServer
 from rclpy.action.server import ServerGoalHandle, GoalResponse, CancelResponse
 
 from std_srvs.srv import Trigger, Trigger_Request, Trigger_Response
 
-from tangram_msgs.msg import RobotAction, PickPlace
+from tangram_msgs.msg import RobotAction, PickPlace, Point2D
 from tangram_msgs.action import ExecuteAction
 from rcl_interfaces.msg import ParameterDescriptor
 
@@ -34,6 +36,7 @@ class ActionExecutor(Node):
 
     def __init__(self):
         super().__init__("action_executor")
+        self.callback_group = None
         self.in_execution = False
         self.actions_ready = False
         self.cancel_requested = False
@@ -41,36 +44,75 @@ class ActionExecutor(Node):
         self.calibration_ready = False
         self.robot_action: RobotAction = None
 
+        self.robot_x = 0.0
+        self.robot_y = 0.0
+
         # self.z_standoff = 0.12
         # self.z_down = 0.06
 
         self.declare_parameter(
-            "standoff",
-            0.12,
+            "pick.standoff",
+            0.15,
             ParameterDescriptor(description="Standoff height"),
         )
         self.declare_parameter(
-            "object",
+            "pick.object",
+            0.06,
+            ParameterDescriptor(description="Object height"),
+        )
+        self.declare_parameter(
+            "place.standoff",
+            0.15,
+            ParameterDescriptor(description="Standoff height"),
+        )
+        self.declare_parameter(
+            "place.object",
             0.06,
             ParameterDescriptor(description="Object height"),
         )
 
-        self.z_standoff = (
-            self.get_parameter("standoff").get_parameter_value().double_value
+        self.pick_standoff = (
+            self.get_parameter("pick.standoff").get_parameter_value().double_value
         )
-        self.z_down = self.get_parameter("object").get_parameter_value().double_value
+        self.pick_object = (
+            self.get_parameter("pick.object").get_parameter_value().double_value
+        )
+        self.place_standoff = (
+            self.get_parameter("place.standoff").get_parameter_value().double_value
+        )
+        self.place_object = (
+            self.get_parameter("place.object").get_parameter_value().double_value
+        )
 
-        self.commander = RobotCommander()
+        self.commander = RobotCommander(self)
 
+        self.sub_robot_pose = self.create_subscription(
+            Point2D,
+            "robot/pose",
+            self.sub_robot_pose_callback,
+            10,
+            callback_group=self.callback_group,
+        )
         self.sub_robot_action = self.create_subscription(
             RobotAction,
             "robot/action",
             self.sub_robot_action_callback,
             10,
+            callback_group=self.callback_group,
         )
 
-        self.srv_reset = self.create_service(Trigger, "reset", self.srv_reset_callback)
-        self.srv_ready = self.create_service(Trigger, "ready", self.srv_ready_callback)
+        self.srv_reset = self.create_service(
+            Trigger,
+            "reset",
+            self.srv_reset_callback,
+            callback_group=self.callback_group,
+        )
+        self.srv_ready = self.create_service(
+            Trigger,
+            "ready",
+            self.srv_ready_callback,
+            callback_group=self.callback_group,
+        )
 
         self.action_execute_action = ActionServer(
             self,
@@ -79,31 +121,37 @@ class ActionExecutor(Node):
             goal_callback=self.action_execute_action_goal_callback,
             cancel_callback=self.action_execute_action_cancel_callback,
             execute_callback=self.action_execute_action_execute_callback,
+            callback_group=self.callback_group,
         )
 
         self.cli_piece_segment_reset = self.create_client(
             Trigger,
             "piece/segment/reset",
+            callback_group=self.callback_group,
         )
 
         self.cli_piece_detection_reset = self.create_client(
             Trigger,
             "piece/detection/reset",
+            callback_group=self.callback_group,
         )
 
         self.cli_piece_p2r_reset = self.create_client(
             Trigger,
             "piece/p2r/reset",
+            callback_group=self.callback_group,
         )
 
         self.cli_puzzle_segment_reset = self.create_client(
             Trigger,
             "puzzle/segment/reset",
+            callback_group=self.callback_group,
         )
 
         self.cli_puzzle_solver_reset = self.create_client(
             Trigger,
             "puzzle/solver/reset",
+            callback_group=self.callback_group,
         )
 
         while not self.cli_piece_segment_reset.wait_for_service(timeout_sec=2.0):
@@ -131,7 +179,14 @@ class ActionExecutor(Node):
                 f"Service {self.cli_puzzle_solver_reset.srv_name} not available, waiting again"
             )
 
+    def sub_robot_pose_callback(self, msg: Point2D):
+        self.robot_x = msg.x
+        self.robot_y = msg.y
+
     def sub_robot_action_callback(self, msg: RobotAction):
+        if len(msg.actions) < 7:
+            return
+
         self.robot_action = msg
 
         if not self.actions_ready:
@@ -196,7 +251,9 @@ class ActionExecutor(Node):
             self.cancel_requested = True
             return CancelResponse.ACCEPT
 
-    def action_execute_action_execute_callback(self, goal_handle: ServerGoalHandle):
+    async def action_execute_action_execute_callback(
+        self, goal_handle: ServerGoalHandle
+    ):
         if self.robot_action is None:
             speech = Speech("Action not received yet, please wait", "en")
             speech.play()
@@ -216,7 +273,7 @@ class ActionExecutor(Node):
 
         actions = copy.deepcopy(self.robot_action.actions)
 
-        stage = 1
+        # stage = 1
 
         for action in actions:
             action: PickPlace
@@ -227,28 +284,43 @@ class ActionExecutor(Node):
             place_x = action.place.x
             place_y = action.place.y
 
+            if action.shape == PickPlace.LARGE_TRIANGLE:
+                pick_x += 0.01
             # motion = 1
 
             shape_name = get_shape_name(action.shape)
             speech = Speech(f"Picking {shape_name}", "en")
             speech.play()
 
+            stage = shape_name
+
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.move_arm(pick_x, pick_y, self.z_standoff, pick=True)
+            # pick_x, pick_y = await self.move_to(
+            #     pick_x,
+            #     pick_y,
+            #     self.pick_standoff,
+            #     pick=True,
+            # )
+            await self.commander.move_arm(
+                pick_x,
+                pick_y,
+                self.pick_standoff,
+                pick=True,
+            )
             self.publish_status(f"Stage {stage} --> Pick standoff", goal_handle)
             # motion += 1
 
             # time.sleep(0.5)
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.grasp()
+            await self.commander.grasp()
             self.publish_status(f"Stage {stage} --> Grasp", goal_handle)
             # motion += 1
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.move_arm(pick_x, pick_y, self.z_down, pick=True)
+            await self.commander.move_arm(pick_x, pick_y, self.pick_object, pick=True)
             self.publish_status(f"Stage {stage} --> Pick object", goal_handle)
             # motion += 1
 
@@ -256,7 +328,13 @@ class ActionExecutor(Node):
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.move_arm(pick_x, pick_y, self.z_standoff, pick=True)
+            # await self.move_to(pick_x, pick_y, self.pick_standoff, pick=True)
+            await self.commander.move_arm(
+                pick_x,
+                pick_y,
+                self.pick_standoff,
+                pick=True,
+            )
             self.publish_status(f"Stage {stage} --> Pick standoff", goal_handle)
             # motion += 1
 
@@ -274,7 +352,9 @@ class ActionExecutor(Node):
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.move_arm(place_x, place_y, self.z_standoff, pick=False)
+            await self.commander.move_arm(
+                place_x, place_y, self.place_standoff, pick=False
+            )
             self.publish_status(f"Stage {stage} --> Place standoff", goal_handle)
             # motion += 1
 
@@ -282,28 +362,35 @@ class ActionExecutor(Node):
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.move_arm(place_x, place_y, self.z_down, pick=False)
+            await self.commander.move_arm(
+                place_x,
+                place_y,
+                self.place_object,
+                pick=False,
+            )
             self.publish_status(f"Stage {stage} --> Place object", goal_handle)
             # motion += 1
 
             # time.sleep(0.5)
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.release()
+            await self.commander.release()
             self.publish_status(f"Stage {stage} --> Release", goal_handle)
             # motion += 1
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            self.commander.move_arm(place_x, place_y, self.z_standoff, pick=False)
+            await self.commander.move_arm(
+                place_x, place_y, self.place_standoff, pick=False
+            )
             self.publish_status(f"Stage {stage} --> Place object", goal_handle)
             # motion += 1
 
-            stage += 1
+            # stage += 1
 
         if self.cancel_requested:
             return self.get_cancel_result(goal_handle)
-        self.commander.go_home()
+        await self.commander.go_home()
         self.publish_status("Final --> Going home", goal_handle)
         # motion += 1
 
@@ -375,13 +462,26 @@ class ActionExecutor(Node):
         self.get_logger().info(f"In state: {status}")
         goal_handle.publish_feedback(feedback)
 
+    async def move_to(self, x: float, y: float, z: float, pick: bool = False):
+        await self.commander.move_arm(x, y, z, pick)
+
+        time.sleep(0.2)
+
+        diff_x = x - self.robot_x
+        diff_y = y - self.robot_y
+
+        await self.commander.move_offset(diff_x, diff_y, 0.0, pick)
+
+        return x + diff_x, y + diff_y
+
 
 def main(args=None):
     rclpy.init(args=args)
     node = ActionExecutor()
 
     try:
-        rclpy.spin(node)
+        # rclpy.spin(node)
+        rclpy.spin(node, MultiThreadedExecutor())
     except KeyboardInterrupt:
         node.destroy_node()
     finally:

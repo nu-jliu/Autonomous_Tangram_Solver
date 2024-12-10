@@ -139,6 +139,9 @@ private:
   /// \brief Sound the buzzer for 3 times
   void run_buzzer_();
 
+  /// \brief Turn on the nozzle
+  void nozzle_on_();
+
   /// \brief Turn off the nozzle
   void nozzle_off_();
 };

@@ -44,17 +44,19 @@ void SolutionPixelToReal::sub_tangram_pieces_pixel_callback_(
 {
   tangram_msgs::msg::TangramPoses poses_msg;
 
-  for (const auto & p : msg->pieces) {
+  for (const auto & piece : msg->pieces) {
     tangram_msgs::msg::TangramPose pose;
 
-    const int x_pixel = p.location.x;
-    const int y_pixel = p.location.y;
+    const int x_pixel = piece.location.x;
+    const int y_pixel = piece.location.y;
 
     pose.location.x = static_cast<double>(x_pixel * scale_);
     pose.location.y = static_cast<double>(y_pixel * scale_ + offset_);
 
-    pose.uuid = p.uuid;
-    pose.type = p.type;
+    pose.uuid = piece.uuid;
+    pose.type = piece.type;
+    pose.theta = piece.theta;
+    pose.flipped = piece.flipped;
 
     poses_msg.poses.push_back(pose);
   }

@@ -146,82 +146,96 @@ void PieceDetection::timer_callback_()
         );
         cv::polylines(img_labeled, approx_contour, true, color);
 
-        const cv::Moments m = cv::moments(approx_contour);
+        // const cv::Moments m = cv::moments(approx_contour);
 
-        if (m.m00 != 0) {
-          const int cx = static_cast<int>(m.m10 / m.m00);
-          const int cy = static_cast<int>(m.m01 / m.m00);
+        // if (m.m00 != 0) {
+        //   const int cx = static_cast<int>(m.m10 / m.m00);
+        //   const int cy = static_cast<int>(m.m01 / m.m00);
 
-          const cv::Point center(cx, cy);
-          const cv::Point center_up(cx - 50, cy);
-          const cv::Point center_down(cx - 50, cy + 15);
-          const cv::Point center_lower(cx - 50, cy + 30);
+        //   const cv::Point center(cx, cy);
+        //   const cv::Point center_up(cx - 50, cy);
+        //   const cv::Point center_down(cx - 50, cy + 15);
+        //   const cv::Point center_lower(cx - 50, cy + 30);
 
+        const cv::Point center = tangram_utils::find_center(approx_contour);
 
-          tangram_msgs::msg::TangramPiece piece;
+        const int cx = center.x;
+        const int cy = center.y;
+        const cv::Point center_up(cx - 50, cy);
+        const cv::Point center_down(cx - 50, cy + 15);
+        const cv::Point center_lower(cx - 50, cy + 30);
 
-          piece.location.x = cx;
-          piece.location.y = row_size - cy;
+        tangram_msgs::msg::TangramPiece piece;
 
-          // for (const cv::Point & p : approx_contour) {
-          //   tangram_msgs::msg::Point2DInt point;
-          //   point.x = p.x;
-          //   point.y = p.y;
+        piece.location.x = cx;
+        piece.location.y = row_size - cy;
 
-          //   piece.contour.push_back(point);
-          // }
+        // for (const cv::Point & p : approx_contour) {
+        //   tangram_msgs::msg::Point2DInt point;
+        //   point.x = p.x;
+        //   point.y = p.y;
 
-          piece.theta = radian;
-          piece.type = static_cast<int32_t>(type);
+        //   piece.contour.push_back(point);
+        // }
 
-          // UUIDv4::UUID uuid = uuid_generator_.getUUID();
+        piece.theta = radian;
+        piece.type = static_cast<int32_t>(type);
 
-          // std::stringstream ss_uuid("");
-          // ss_uuid << uuid;
-          const boost::uuids::uuid uuid = uuid_genorator_();
-          piece.uuid = boost::uuids::to_string(uuid);
-          // piece.uuid = uuid.bytes();
-
-          pieces_msg.pieces.push_back(piece);
-
-          std::stringstream ss_center("");
-          ss_center << cx << ", " << cy;
-          const std::string text_center = ss_center.str();
-
-
-          const cv::Scalar color_text(255, 255, 255);
-
-          const double scale = 0.5;
-          cv::circle(img_labeled, center, 5, color, -1);
-          cv::putText(
-            img_labeled,
-            name,
-            center_down,
-            cv::FONT_HERSHEY_SIMPLEX,
-            scale,
-            color_text,
-            1
-          );
-          cv::putText(
-            img_labeled,
-            text_center,
-            center_lower,
-            cv::FONT_HERSHEY_SIMPLEX,
-            scale,
-            color_text,
-            1
-          );
-          cv::putText(
-            img_labeled,
-            text_area,
-            center_up,
-            cv::FONT_HERSHEY_SIMPLEX,
-            scale,
-            color_text,
-            1
-          );
+        if (type < 3) {
+          const bool flipped = tangram_utils::is_triangle_flipped(approx_contour);
+          piece.flipped = flipped;
+        } else {
+          piece.flipped = false;
         }
+
+        // UUIDv4::UUID uuid = uuid_generator_.getUUID();
+
+        // std::stringstream ss_uuid("");
+        // ss_uuid << uuid;
+        const boost::uuids::uuid uuid = uuid_genorator_();
+        piece.uuid = boost::uuids::to_string(uuid);
+        // piece.uuid = uuid.bytes();
+
+        pieces_msg.pieces.push_back(piece);
+
+        std::stringstream ss_center("");
+        ss_center << cx << ", " << cy;
+        const std::string text_center = ss_center.str();
+
+
+        const cv::Scalar color_text(255, 255, 255);
+
+        const double scale = 0.5;
+        cv::circle(img_labeled, center, 5, color, -1);
+        cv::putText(
+          img_labeled,
+          name,
+          center_down,
+          cv::FONT_HERSHEY_SIMPLEX,
+          scale,
+          color_text,
+          1
+        );
+        cv::putText(
+          img_labeled,
+          text_center,
+          center_lower,
+          cv::FONT_HERSHEY_SIMPLEX,
+          scale,
+          color_text,
+          1
+        );
+        cv::putText(
+          img_labeled,
+          text_area,
+          center_up,
+          cv::FONT_HERSHEY_SIMPLEX,
+          scale,
+          color_text,
+          1
+        );
       }
+      // }
 
 
       const auto image_erodes = cv_bridge::CvImage(

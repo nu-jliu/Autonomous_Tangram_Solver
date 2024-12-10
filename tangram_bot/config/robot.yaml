@@ -1,0 +1,8 @@
+action_executor:
+  ros__parameters:
+    pick:
+      standoff: 0.12
+      object: 0.06
+    place:
+      standoff: 0.12
+      object: 0.06

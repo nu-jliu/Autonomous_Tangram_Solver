@@ -169,67 +169,79 @@ void PuzzleSolver::timer_callback_()
         );
         cv::polylines(contours_labeled, approx_contour, true, color);
 
-        const cv::Moments m = cv::moments(approx_contour);
+        // const cv::Moments m = cv::moments(approx_contour);
 
-        if (m.m00 != 0) {
-          const int cx = static_cast<int>(m.m10 / m.m00);
-          const int cy = static_cast<int>(m.m01 / m.m00);
 
-          const cv::Point center(cx, cy);
-          const cv::Point center_up(cx - 50, cy);
-          const cv::Point center_down(cx - 50, cy + 15);
-          const cv::Point center_lower(cx - 50, cy + 30);
+        // if (m.m00 != 0) {
+        // const int cx = static_cast<int>(m.m10 / m.m00);
+        // const int cy = static_cast<int>(m.m01 / m.m00);
 
-          tangram_msgs::msg::TangramPiece piece;
+        // const cv::Point center(cx, cy);
+        const cv::Point center = tangram_utils::find_center(approx_contour);
+        const int cx = center.x;
+        const int cy = center.y;
 
-          piece.location.x = static_cast<int32_t>(cx - col_size / 2);
-          piece.location.y = static_cast<int32_t>(cy - row_size / 2);
+        const cv::Point center_up(cx - 50, cy);
+        const cv::Point center_down(cx - 50, cy + 15);
+        const cv::Point center_lower(cx - 50, cy + 30);
 
-          piece.theta = radian;
-          piece.type = static_cast<int32_t>(type);
+        tangram_msgs::msg::TangramPiece piece;
 
-          const boost::uuids::uuid uuid = uuid_generator_();
-          piece.uuid = boost::uuids::to_string(uuid);
+        piece.location.x = static_cast<int32_t>(cx - col_size / 2);
+        piece.location.y = static_cast<int32_t>(cy - row_size / 2);
 
-          pieces_msg.pieces.push_back(piece);
+        piece.theta = radian;
+        piece.type = static_cast<int32_t>(type);
 
-          std::stringstream ss_center("");
-          ss_center << cx << ", " << cy;
-          const std::string text_center = ss_center.str();
-
-          const cv::Scalar color_text(255, 255, 255);
-
-          cv::circle(contours_labeled, center, 5, color, -1);
-
-          const double scale = 0.5;
-          cv::putText(
-            contours_labeled,
-            text_center,
-            center_up,
-            cv::FONT_HERSHEY_SIMPLEX,
-            scale,
-            color_text,
-            1
-          );
-          cv::putText(
-            contours_labeled,
-            name,
-            center_down,
-            cv::FONT_HERSHEY_SIMPLEX,
-            scale,
-            color_text,
-            1
-          );
-          cv::putText(
-            contours_labeled,
-            text_degree,
-            center_lower,
-            cv::FONT_HERSHEY_SIMPLEX,
-            scale,
-            color_text,
-            1
-          );
+        if (type < 3) {
+          const bool flipped = tangram_utils::is_triangle_flipped(approx_contour);
+          piece.flipped = flipped;
+        } else {
+          piece.flipped = false;
         }
+
+        const boost::uuids::uuid uuid = uuid_generator_();
+        piece.uuid = boost::uuids::to_string(uuid);
+
+        pieces_msg.pieces.push_back(piece);
+
+        std::stringstream ss_center("");
+        ss_center << cx << ", " << cy;
+        const std::string text_center = ss_center.str();
+
+        const cv::Scalar color_text(255, 255, 255);
+
+        cv::circle(contours_labeled, center, 5, color, -1);
+
+        const double scale = 0.5;
+        cv::putText(
+          contours_labeled,
+          text_center,
+          center_up,
+          cv::FONT_HERSHEY_SIMPLEX,
+          scale,
+          color_text,
+          1
+        );
+        cv::putText(
+          contours_labeled,
+          name,
+          center_down,
+          cv::FONT_HERSHEY_SIMPLEX,
+          scale,
+          color_text,
+          1
+        );
+        cv::putText(
+          contours_labeled,
+          text_degree,
+          center_lower,
+          cv::FONT_HERSHEY_SIMPLEX,
+          scale,
+          color_text,
+          1
+        );
+        // }
       }
 
       const auto image_source = cv_bridge::CvImage(

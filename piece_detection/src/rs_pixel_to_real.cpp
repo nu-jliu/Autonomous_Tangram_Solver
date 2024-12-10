@@ -120,9 +120,10 @@ void RealSensePixelToReal::timer_callback_()
 
       tangram_msgs::msg::TangramPose pose;
 
+      pose.uuid = piece.uuid;
       pose.type = piece.type;
       pose.theta = piece.theta;
-      pose.uuid = piece.uuid;
+      pose.flipped = piece.flipped;
 
       pose.location.x = real_x;
       pose.location.y = real_y;

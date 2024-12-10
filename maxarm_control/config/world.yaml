@@ -5,7 +5,7 @@ frame_align:
       r01: 0.0
       r10: 0.0
       r11: -1.0
-      px: 0.20
+      px: 0.25
       py: -0.10
 
     camera_tag:

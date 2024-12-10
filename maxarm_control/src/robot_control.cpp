@@ -40,7 +40,7 @@ RobotControl::RobotControl()
 
   go_home_();
   nozzle_off_();
-  // run_buzzer_();
+  run_buzzer_();
 
   srv_grasp_ = create_service<std_srvs::srv::Trigger>(
     "gripper/grasp",
@@ -139,8 +139,7 @@ void RobotControl::srv_grasp_callback_(
 )
 {
   (void) request;
-  arm_serial_port_->Write("nozzle.on()\r\n");
-  wait_for_data_();
+  nozzle_on_();
 
   response->success = true;
 }
@@ -151,8 +150,7 @@ void RobotControl::srv_release_callback_(
 )
 {
   (void) request;
-  arm_serial_port_->Write("nozzle.off()\r\n");
-  wait_for_data_();
+  nozzle_off_();
 
   response->success = true;
 }
@@ -344,7 +342,7 @@ void RobotControl::go_home_()
   arm_serial_port_->Write("nozzle.set_angle(0)\r\n");
   wait_for_data_();
 
-  std::this_thread::sleep_for(1s);
+  std::this_thread::sleep_for(1.0s);
 }
 
 bool RobotControl::wait_for_data_()
@@ -369,13 +367,14 @@ bool RobotControl::wait_for_data_()
 
   bool success = false;
 
-  // RCLCPP_INFO(get_logger(), "Received response:");
+  RCLCPP_INFO(get_logger(), "Received response:");
   while (std::getline(ss_response, line)) {
     RCLCPP_INFO_STREAM(get_logger(), line);
     if (line.substr(0, 4) == "True") {
       success = true;
     }
   }
+  RCLCPP_INFO_STREAM(get_logger(), " ");
 
   return success;
 }
@@ -389,16 +388,20 @@ void RobotControl::run_buzzer_()
     arm_serial_port_->Write("buzzer.off()\r\n");
     wait_for_data_();
 
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(50ms);
   }
+}
+
+void RobotControl::nozzle_on_()
+{
+  arm_serial_port_->Write("nozzle.on()\r\n");
+  wait_for_data_();
 }
 
 void RobotControl::nozzle_off_()
 {
   arm_serial_port_->Write("nozzle.off()\r\n");
   wait_for_data_();
-
-  std::this_thread::sleep_for(500ms);
 }
 }
 

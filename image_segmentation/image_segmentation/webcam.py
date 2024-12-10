@@ -49,9 +49,9 @@ class WebCamera(Node):
                         device_info.append((device, name))
                         break
             except subprocess.CalledProcessError as e:
-                print(f"Failed to get info for {device}: {e}")
+                self.get_logger().error(f"Failed to get info for {device}: {e}")
             except FileNotFoundError:
-                print("v4l2-ctl not found. Please install v4l-utils.")
+                self.get_logger().error("v4l2-ctl not found. Please install v4l-utils.")
                 self.destroy_node()
                 rclpy.try_shutdown()
                 return
@@ -62,7 +62,7 @@ class WebCamera(Node):
         for device, name in device_info:
             self.get_logger().info(f"{self.camera_name, name, device}")
             if self.camera_name in name:
-                print(device)
+                # print(device)
                 num_device = int(device.split("video")[1])
                 device_numbers.append(num_device)
 

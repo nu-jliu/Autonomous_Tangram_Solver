@@ -52,28 +52,28 @@ FrameAlign::FrameAlign()
   declare_parameter<double>("camera_tag.px", 0.0, rt_px_des);
   declare_parameter<double>("camera_tag.py", 0.0, rt_py_des);
 
-  const auto rt_r00 = get_parameter("robot_tag.r00").as_double();
-  const auto rt_r01 = get_parameter("robot_tag.r01").as_double();
-  const auto rt_r10 = get_parameter("robot_tag.r10").as_double();
-  const auto rt_r11 = get_parameter("robot_tag.r11").as_double();
-  const auto rt_px = get_parameter("robot_tag.px").as_double();
-  const auto rt_py = get_parameter("robot_tag.py").as_double();
-  const auto ct_r00 = get_parameter("camera_tag.r00").as_double();
-  const auto ct_r01 = get_parameter("camera_tag.r01").as_double();
-  const auto ct_r10 = get_parameter("camera_tag.r10").as_double();
-  const auto ct_r11 = get_parameter("camera_tag.r11").as_double();
-  const auto ct_px = get_parameter("camera_tag.px").as_double();
-  const auto ct_py = get_parameter("camera_tag.py").as_double();
+  rt_r00_ = get_parameter("robot_tag.r00").as_double();
+  rt_r01_ = get_parameter("robot_tag.r01").as_double();
+  rt_r10_ = get_parameter("robot_tag.r10").as_double();
+  rt_r11_ = get_parameter("robot_tag.r11").as_double();
+  rt_px_ = get_parameter("robot_tag.px").as_double();
+  rt_py_ = get_parameter("robot_tag.py").as_double();
+  ct_r00_ = get_parameter("camera_tag.r00").as_double();
+  ct_r01_ = get_parameter("camera_tag.r01").as_double();
+  ct_r10_ = get_parameter("camera_tag.r10").as_double();
+  ct_r11_ = get_parameter("camera_tag.r11").as_double();
+  ct_px_ = get_parameter("camera_tag.px").as_double();
+  ct_py_ = get_parameter("camera_tag.py").as_double();
 
   T_robot_tag_ = {
-    {rt_r00, rt_r01, rt_px},
-    {rt_r10, rt_r11, rt_py},
+    {rt_r00_, rt_r01_, rt_px_},
+    {rt_r10_, rt_r11_, rt_py_},
     {0.0, 0.0, 1.0}
   };
 
   T_camera_tag_ = {
-    {ct_r00, ct_r01, ct_px},
-    {ct_r10, ct_r11, ct_py},
+    {ct_r00_, ct_r01_, ct_px_},
+    {ct_r10_, ct_r11_, ct_py_},
     {0.0, 0.0, 1.0}
   };
 
@@ -84,6 +84,15 @@ FrameAlign::FrameAlign()
     10,
     std::bind(
       &FrameAlign::sub_pieces_pos_cam_callback_,
+      this,
+      std::placeholders::_1
+    )
+  );
+  sub_apriltag_detect_ = create_subscription<tangram_msgs::msg::Point2D>(
+    "april/detect",
+    10,
+    std::bind(
+      &FrameAlign::sub_apriltag_detect_callback_,
       this,
       std::placeholders::_1
     )
@@ -99,6 +108,7 @@ FrameAlign::FrameAlign()
   );
 
   pub_pieces_pose_robot_ = create_publisher<tangram_msgs::msg::TangramPoses>("pick/robot", 10);
+  pub_robot_pose_ = create_publisher<tangram_msgs::msg::Point2D>("robot/pose", 10);
 }
 
 void FrameAlign::sub_pieces_pos_cam_callback_(const tangram_msgs::msg::TangramPoses::SharedPtr msg)
@@ -106,15 +116,15 @@ void FrameAlign::sub_pieces_pos_cam_callback_(const tangram_msgs::msg::TangramPo
   if (apriltag_ready_) {
     tangram_msgs::msg::TangramPoses msg_poses_robot;
 
-    for (const auto & p : msg->poses) {
-      const double x_cam = p.location.x;
-      const double y_cam = p.location.y;
+    for (const auto & piece : msg->poses) {
+      const double x_cam = piece.location.x;
+      const double y_cam = piece.location.y;
 
       const arma::colvec3 pvec_cam{x_cam, y_cam, 1.0};
-      const arma::colvec3 pvev_robot = T_robot_camera_ * pvec_cam;
+      const arma::colvec3 pvec_robot = T_robot_camera_ * pvec_cam;
 
-      const double x_robot = pvev_robot.at(0);
-      const double y_robot = pvev_robot.at(1);
+      const double x_robot = pvec_robot.at(0);
+      const double y_robot = pvec_robot.at(1);
 
       tangram_msgs::msg::TangramPose pose;
 
@@ -122,15 +132,36 @@ void FrameAlign::sub_pieces_pos_cam_callback_(const tangram_msgs::msg::TangramPo
       pose.location.y = y_robot;
 
       // pose.contour = p.contour;
-      pose.type = p.type;
-      pose.theta = p.theta;
-      pose.uuid = p.uuid;
+      pose.uuid = piece.uuid;
+      pose.type = piece.type;
+      pose.theta = piece.theta;
+      pose.flipped = piece.flipped;
 
       msg_poses_robot.poses.push_back(pose);
     }
 
     pub_pieces_pose_robot_->publish(msg_poses_robot);
   }
+}
+
+void FrameAlign::sub_apriltag_detect_callback_(const tangram_msgs::msg::Point2D::SharedPtr msg)
+{
+  const auto px = msg->x;
+  const auto py = msg->y;
+
+  const arma::mat33 T_cammera_arm{
+    {ct_r00_, ct_r01_, px},
+    {ct_r10_, ct_r11_, py},
+    {0.0, 0.0, 1.0}
+  };
+
+  const arma::mat33 T_robot_arm = T_robot_camera_ * T_cammera_arm;
+
+  tangram_msgs::msg::Point2D msg_robot_pose;
+  msg_robot_pose.x = T_robot_arm.at(0, 2);
+  msg_robot_pose.y = T_robot_arm.at(1, 2);
+
+  pub_robot_pose_->publish(msg_robot_pose);
 }
 
 void FrameAlign::sub_apriltag_saved_callback_(const tangram_msgs::msg::Point2D::SharedPtr msg)

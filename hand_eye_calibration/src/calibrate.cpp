@@ -55,32 +55,33 @@ void Calibrate::timer_callback_()
     msg.y = py_saved_;
 
     pub_apriltag_saved_->publish(msg);
-  } else {
-    try {
-      const auto tf = tf_buffer_->lookupTransform(source_frame_, target_frame_, tf2::TimePointZero);
-
-      px_curr_ = tf.transform.translation.x;
-      py_curr_ = tf.transform.translation.y;
-
-      RCLCPP_DEBUG_STREAM(
-        get_logger(), "Received transform from " << source_frame_ << " to " << target_frame_);
-      RCLCPP_DEBUG_STREAM(get_logger(), "x: " << px_curr_ << ", y: " << py_curr_);
-
-      tangram_msgs::msg::Point2D msg;
-      msg.x = px_curr_;
-      msg.y = py_curr_;
-
-      pub_apriltag_detect_->publish(msg);
-    } catch (const tf2::TransformException & e) {
-      RCLCPP_ERROR_STREAM_ONCE(
-        get_logger(),
-        "Unable to get transform from "
-          << source_frame_ << " to " << target_frame_
-          << ": " << e.what()
-      );
-      return;
-    }
   }
+
+  try {
+    const auto tf = tf_buffer_->lookupTransform(source_frame_, target_frame_, tf2::TimePointZero);
+
+    px_curr_ = tf.transform.translation.x;
+    py_curr_ = tf.transform.translation.y;
+
+    RCLCPP_DEBUG_STREAM(
+      get_logger(), "Received transform from " << source_frame_ << " to " << target_frame_);
+    RCLCPP_DEBUG_STREAM(get_logger(), "x: " << px_curr_ << ", y: " << py_curr_);
+
+    tangram_msgs::msg::Point2D msg;
+    msg.x = px_curr_;
+    msg.y = py_curr_;
+
+    pub_apriltag_detect_->publish(msg);
+  } catch (const tf2::TransformException & e) {
+    RCLCPP_ERROR_STREAM_ONCE(
+      get_logger(),
+      "Unable to get transform from "
+        << source_frame_ << " to " << target_frame_
+        << ": " << e.what()
+    );
+    return;
+  }
+
 }
 
 void Calibrate::srv_save_callback_(

@@ -54,14 +54,26 @@ void draw_axis(
 
 /// \brief Validate if has correct shapes
 /// \param shapes The shapes of the tangram pieces
-/// \return true if valid, othervise false
+/// \return true if valid
+/// \return false if invalid
 bool validate_pieces(const std::vector<size_t> & shapes);
 
 /// \brief Get the angle between two vector in CCW direction
 /// \param v1 The first vector
 /// \param v2 The second vector
 /// \return The angle between two vector
-double get_ccw_angle(const cv::Point & v1, const cv::Point v2);
+double get_ccw_angle(const cv::Point & v1, const cv::Point & v2);
+
+/// \brief Determine if the triangle if flipped
+/// \param triangle The contour of the triangle
+/// \return true if flipped
+/// \return false othervise
+bool is_triangle_flipped(const std::vector<cv::Point> & contour);
+
+/// \brief Find the center of a contour
+/// \param contour The contour shape
+/// \return The center point of the contour
+const cv::Point find_center(const std::vector<cv::Point> & contour);
 
 /// \brief Find the index of the closest matching tangram piece
 /// \param contour The contour of the detected tangram piece
