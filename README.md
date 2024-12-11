@@ -5,7 +5,8 @@
 This repo contains the packages necessary for a robot arm to autonomously picks up tangram pieces and solves the tangram puzzle.
 
 ## Final Video
-<iframe width="800" height="560" src="https://www.youtube.com/embed/1sL6v5JUFx0?si=-zl5taqeXtQbnnAh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+![](https://github.com/user-attachments/assets/520b7747-861c-40a6-80e3-4880118254c8)
 
 ## Install Dependencies
 
