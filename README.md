@@ -24,6 +24,18 @@ sudo apt install libbost-all-dev
 sudo apt install libopencv-dev
 ```
 
+*Armadillo*
+
+```bash
+sudo apt install libarmadillo-dev
+```
+
+*librealsense2*
+
+```bash
+sudo apt install librealsense2-dev librealsense2-utils
+```
+
 *ROS2 Iron*
 
 Configure locale
@@ -72,10 +84,32 @@ sudo apt install ros-iron-desktop-full
 
 ## Building all packages
 
+Setup backages
+
 ```bash
 export WORKSPACE=<path/to/your/workspace>
 
 mkdir -p ${WORKSPACE}/src
 cd ${WORKSPACE}
 vcs import --input src < https://raw.githubusercontent.com/nu-jliu/Autonomous_Tangram_Solver/refs/heads/main/tangram.repos
+rosdep install --from-paths src --ignore-src -r -y --skip-keys boost --skip-keys OpenCV
 ```
+
+Build
+
+```bash
+cd ${WORKSPACE}
+colcon clean workspace -y
+colcon build --symlink-install --event-handlers console_direct+
+```
+
+## Packages
+
+ - `hand_eye_calibration`: Performs the hand-eye calibration steps for getting the positional relationship between the camera frame and the robot frame.
+ - `image_segmentation`: Runs all vision models for this project to segment images using trained model.
+ - `maxarm_control`: Performs the low-level position control of the robot arm.
+ - `piece_detection`: Detects pose of all tangram pieces for solving the puzzle
+ - `puzzle_solver`: Solving the tangram puzzle, generating the goal pose for each tangram pieces.
+ - `tangram_bot`: Generate robot actions and execute the actions to pick and place tangram pieces to solve the puzzle.
+ - `tangram_msgs`: All custom interfaces used for IPC (Inter-Process Communication)
+ - `tangram_utils`: All library functions for

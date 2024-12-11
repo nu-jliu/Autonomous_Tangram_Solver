@@ -190,28 +190,6 @@ double tangram_piece_orientation(const std::vector<cv::Point> & contour)
 
 double get_tangram_piece_orientation(const std::vector<cv::Point> & contour, const cv::Mat & img)
 {
-  // cv::Mat data(contour.size(), 2, CV_32F);
-  // for (size_t i = 0; i < contour.size(); ++i) {
-  //   const cv::Point p = contour.at(i);
-  //   data.at<float>(i, 0) = static_cast<float>(p.x);
-  //   data.at<float>(i, 1) = static_cast<float>(p.y);
-  // }
-
-  // cv::Mat mean;
-  // cv::Mat eigen_vectors;
-  // cv::Mat eigen_values;
-
-  // cv::PCACompute(data, mean, eigen_vectors, eigen_values);
-
-  // const float v00 = eigen_vectors.at<float>(0, 0);
-  // const float v01 = eigen_vectors.at<float>(0, 1);
-  // const cv::Point2f principal_axis(v00, v01);
-
-  // const double angle = std::atan2(principal_axis.y, principal_axis.x);
-
-  // return angle;
-
-  //Construct a buffer used by the pca analysis
   const int sz = static_cast<int>(contour.size());
   cv::Mat data_pts(sz, 2, CV_64F);
   for (int i = 0; i < data_pts.rows; i++) {
@@ -239,7 +217,6 @@ double get_tangram_piece_orientation(const std::vector<cv::Point> & contour, con
     eigen_val.at(i) = pca_analysis.eigenvalues.at<double>(i);
   }
 
-  // std::cout << pca_analysis.eigenvalues.size() << std::endl;
   const cv::Point2d v1 = eigen_vecs.at(0);
   const cv::Point2d v2 = eigen_vecs.at(1);
   const double angle_ccw = get_ccw_angle(v1, v2);
@@ -249,10 +226,7 @@ double get_tangram_piece_orientation(const std::vector<cv::Point> & contour, con
     eigen_vecs.at(0).y *= -1.0;
   }
 
-  // std::cout << (angle_ccw * 180.0 / CV_PI) << std::endl;
-
   // Draw the principal components
-  // cv::circle(img, cntr, 3, cv::Scalar(255, 0, 255), 2);
   cv::Point p1 = center + 0.02 * cv::Point(
     static_cast<int>(eigen_vecs.at(0).x * eigen_val.at(0)),
     static_cast<int>(eigen_vecs.at(0).y * eigen_val.at(0))
