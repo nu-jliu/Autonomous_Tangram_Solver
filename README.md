@@ -6,7 +6,9 @@ This repo contains the packages necessary for a robot arm to autonomously picks 
 
 ## Final Video
 
-![](https://github.com/user-attachments/assets/520b7747-861c-40a6-80e3-4880118254c8)
+<!-- ![](https://github.com/user-attachments/assets/520b7747-861c-40a6-80e3-4880118254c8) -->
+
+<video src="https://github.com/user-attachments/assets/520b7747-861c-40a6-80e3-4880118254c8" controls></video>
 
 ## Install Dependencies
 
