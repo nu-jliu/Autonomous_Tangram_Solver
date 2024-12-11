@@ -46,7 +46,8 @@ def generate_launch_description():
         package=package_name,
         executable="web_camera",
         name="web_camera",
-        parameters=[{"camera_name": "Amcrest AWC2198 USB Webcam"}],
+        # parameters=[{"camera_name": "Amcrest AWC2198 USB Webcam"}],
+        parameters=[{"camera_name": "BisonCam,NB Pro"}],
     )
 
     node_detect = Node(

@@ -46,13 +46,20 @@ private:
   cv::Mat source_img_;
   cv::Mat target_img_;
 
+  /// \brief
   void timer_callback_();
 
+  /// \brief
+  /// \param request
+  /// \param response
   void srv_reset_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response
   );
 
+  /// \brief
+  /// \param request
+  /// \param response
   void sub_tangram_image_inferenced_callback_(sensor_msgs::msg::Image::SharedPtr msg);
 };
 }  // namespace puzzle_solver

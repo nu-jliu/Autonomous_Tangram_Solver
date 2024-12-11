@@ -15,6 +15,7 @@ namespace hand_eye_calibration
 class Calibrate : public rclcpp::Node
 {
 public:
+  /// \brief Contructor of the calibrate node
   Calibrate();
 
 private:
@@ -38,8 +39,12 @@ private:
   std::string source_frame_;
   std::string target_frame_;
 
+  /// \brief publish the raw and the calibrated apriltag position
   void timer_callback_();
 
+  /// \brief Save the current detected apriltag
+  /// \param request Request object of the service
+  /// \param response Response object of the service
   void srv_save_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response

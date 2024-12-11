@@ -9,4 +9,4 @@ yolo*.pt
 
 **/runs/**
 **/yolo_shapes/**
-.DS_STORE
+**/.DS_STORE

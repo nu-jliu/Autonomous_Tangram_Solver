@@ -65,7 +65,7 @@ class PuzzleSegment(Node):
         self.model = CAE(input_channels=1)
         self.model.load_state_dict(torch.load(self.model_path, weights_only=True))
         self.model.to(self.device)
-        self.get_logger().info(f"Finished moding model")
+        self.get_logger().info(f"Finished looding model")
 
         self.current_shape = ""
         self.input_tensor = None
@@ -117,11 +117,7 @@ class PuzzleSegment(Node):
         speech.play()
 
     def timer_callback(self):
-        # if self.input_tensor is True:
-        #     segment_tensor = self.model.forward(self.input_tensor)
-        #     segment_tensor = segment_tensor.squeeze(0).cpu()
-        #     segment_tensor = (segment_tensor > 0.5).float().numpy()
-        #     image_msg = self.bridge.cv2_to_imgmsg(segment_tensor, encoding="mono8")
+        """Timer callback of the node"""
 
         if self.input_tensor is not None and self.input_ready:
 
@@ -147,6 +143,11 @@ class PuzzleSegment(Node):
             self.pub_image_target.publish(origin_image_msg)
 
     def sub_puzzle_shape_callback(self, msg: PuzzleShape):
+        """Subscription callback of the puzzle shape
+
+        :param msg: subcribed message
+        :type msg: PuzzleShape
+        """
         shape = msg.shape
         target_path = os.path.join(self.image_dir, f"{shape}.png")
 
@@ -155,9 +156,6 @@ class PuzzleSegment(Node):
                 image = PIL_Image.open(target_path).convert("L")
                 tensor = self.transform(image).unsqueeze(0)
                 tensor = (tensor > 0.5).float()
-
-                # speech = Speech(f"Received input: {target_name}", "en")
-                # speech.play()
 
                 self.origin_array = tensor.squeeze(0).cpu().numpy()
                 self.origin_array = (self.origin_array * 255).astype(np.uint8)
@@ -170,16 +168,19 @@ class PuzzleSegment(Node):
                 self.current_shape = shape
 
                 self.get_logger().info(f"Target shape set to {shape} successfully")
-
-                # response.success = True
-                # return response
             except FileNotFoundError:
                 self.get_logger().error(f"File for target {shape} not found")
 
-                # response.success = False
-                # return response
-
     def srv_reset_callback(self, request: Trigger_Request, response: Trigger_Response):
+        """Service callback of the reset service
+
+        :param request: requet object of the service
+        :type request: Trigger_Request
+        :param response: response object of the service
+        :type response: Trigger_Response
+        :return: response object
+        :rtype: Trigger_Response
+        """
         self.get_logger().info("Node resetted")
 
         self.input_tensor = None
@@ -193,6 +194,15 @@ class PuzzleSegment(Node):
         request: SetTarget_Request,
         response: SetTarget_Response,
     ):
+        """Service callback of the set target service
+
+        :param request: Request object of the service
+        :type request: SetTarget_Request
+        :param response: Response object of the service
+        :type response: SetTarget_Response
+        :return: Response object
+        :rtype: SetTarget_Response
+        """
         target_name = request.target
         target_path = os.path.join(self.image_dir, f"{target_name}.png")
 
@@ -225,6 +235,11 @@ class PuzzleSegment(Node):
 
 
 def main(args=None):
+    """Main function of the node
+
+    :param args: arguments to the node, defaults to None
+    :type args: list[str], optional
+    """
     rclpy.init(args=args)
     node = PuzzleSegment()
 

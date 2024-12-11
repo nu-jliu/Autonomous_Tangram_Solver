@@ -32,6 +32,7 @@ private:
 
   cv::VideoCapture cap_;
 
+  /// \brief Publish the web camera image info
   void timer_callback();
 };
 } /// namespace puzzle_solver

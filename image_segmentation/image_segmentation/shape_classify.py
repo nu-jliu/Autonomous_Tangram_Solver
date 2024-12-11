@@ -60,6 +60,7 @@ class ShapeClassify(Node):
         )
 
     def timer_callback(self):
+        """Timer callback"""
         if self.cv_image is not None:
 
             cv_image = copy.deepcopy(self.cv_image)
@@ -98,6 +99,11 @@ class ShapeClassify(Node):
                 self.pub_image_classified.publish(msg_classied)
 
     def sub_image_raw_callback(self, msg: Image):
+        """Subscribe the raw image
+
+        :param msg: Subcribed the raw image
+        :type msg: Image
+        """
         self.cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
         if not self.image_ready:

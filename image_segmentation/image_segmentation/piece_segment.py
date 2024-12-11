@@ -69,12 +69,8 @@ class PieceSegment(Node):
         self.generator = SAM2AutomaticMaskGenerator(sam2)
 
         self.bridge = cv_bridge.CvBridge()
-        # self.cv_image = None
         self.cv_image = None
         self.image_ready = False
-        # self.segmented_image = None
-        # self.mask_image = None
-        # self.images_ready = False
 
         self.timer = self.create_timer(
             5.0,
@@ -120,7 +116,6 @@ class PieceSegment(Node):
         if self.cv_image is not None:
             cv_image = self.cv_image.copy()
             self.get_logger().info(f"Shape: {cv_image.shape}")
-            # cv_image = cv_image[40:680, 320:960, :]
             w, h, _ = cv_image.shape
 
             start_time = time.time()
@@ -143,9 +138,6 @@ class PieceSegment(Node):
                     continue
 
                 mask = mask_data["segmentation"]
-                shape = mask.shape
-                max_val = np.max(mask)
-                # self.get_logger().info(f"Mask shape: {shape}, max: {max_val}")
 
                 mask = (mask * 255).astype(np.uint8)
                 mask_image = cv2.bitwise_or(mask_image, mask)

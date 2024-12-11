@@ -40,7 +40,6 @@ class ScanAprilTag(Node):
         self.timer = self.create_timer(
             0.01,
             self.timer_callback,
-            # callback_group=self.callback_group,
         )
 
         self.apriltag_detect = self.create_subscription(
@@ -73,12 +72,10 @@ class ScanAprilTag(Node):
                 f"Service {self.cli_save.srv_name} not available, waiting again"
             )
 
-        # asyncio.run(self.commander.go_home())
-        # asyncio.run(self.commander.move_arm(0.25, -0.1, 0.1, pick=False))
-
         self.state = States.Initialize
 
     async def timer_callback(self):
+        """Run the workflow for camera calibration"""
         if self.state == States.Initialize:
             if not self.robot_ready:
                 self.robot_ready = True
@@ -127,31 +124,21 @@ class ScanAprilTag(Node):
         else:
             self.get_logger().error("Invalid state")
 
-        # elif not self.apriltag_ready:
-        #     if self.apriltag_pos is not None:
-        #         if self.start_time == 0.0:
-        #             self.start_time = time.time()
-
-        #         diff = time.time() - self.start_time
-        #         self.counter += 1
-        #         # if self.counter > 20:
-        #         if diff > 10.0 and self.counter > 100:
-        #             await self.commander.go_home()
-
-        #             self.get_logger().info("Saving apriltag")
-        #             future = self.cli_ready.call_async(Trigger.Request())
-        #             await future
-
-        #             future = self.cli_save.call_async(Trigger.Request())
-        #             await future
-
-        #             self.apriltag_ready = True
-
     def sub_cam_to_arm_callback(self, msg: Point2D):
+        """Get the apriltag position
+
+        :param msg: The subcribed message object of the apriltag position
+        :type msg: Point2D
+        """
         self.apriltag_pos = msg
 
 
 def main(args=None):
+    """Main program of the scan_apriltag node
+
+    :param args: arguments of the node, defaults to None
+    :type args: list[str], optional
+    """
     rclpy.init(args=args)
     node = ScanAprilTag()
 

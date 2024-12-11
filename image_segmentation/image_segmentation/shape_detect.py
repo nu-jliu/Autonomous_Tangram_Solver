@@ -39,6 +39,7 @@ class ShapeDetect(Node):
         self.model = YOLO(model_path, task="classify", verbose=True)
 
         self.cv_image = None
+        self.color_image = None
         self.image_ready = False
 
         self.bridge = CvBridge()
@@ -125,7 +126,9 @@ class ShapeDetect(Node):
                 self.pub_image_detect.publish(msg_classied)
 
     def sub_image_raw_callback(self, msg: Image):
-        self.cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        self.color_image = cv_image
+        self.cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2BGRA)
 
         if not self.image_ready:
             self.image_ready = True

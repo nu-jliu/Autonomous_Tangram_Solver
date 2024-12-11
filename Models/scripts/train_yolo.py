@@ -11,7 +11,7 @@ MODEL_DIR = os.path.join(FILE_DIR, "..", "model")
 
 rf = Roboflow(api_key="8CrldWKFJ6M2rJPp0f9f")
 project = rf.workspace("cell-fcwyr").project("shape-detection-tet2v")
-version = project.version(2)
+version = project.version(3)
 dataset = version.download("yolov11", location=DATA_DIR, overwrite=True)
 
 if __name__ == "__main__":
