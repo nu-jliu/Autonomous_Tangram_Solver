@@ -58,11 +58,17 @@ private:
     tangram_msgs::srv::ReadPosition::Response response
   );
 
+  /// \brief Grasp an object
+  /// \param request Request object of the service`
+  /// \param response Response object of the service
   void srv_grasp_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response
   );
 
+  /// \brief Release an object
+  /// \param request Request object of the service
+  /// \param response Response object of the service
   void srv_release_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response

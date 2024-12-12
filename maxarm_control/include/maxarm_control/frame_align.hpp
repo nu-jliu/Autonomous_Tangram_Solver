@@ -13,6 +13,7 @@ namespace maxarm_control
 class FrameAlign : public rclcpp::Node
 {
 public:
+  /// \brief Constructor of the frame_align node
   FrameAlign();
 
 private:
@@ -44,12 +45,21 @@ private:
   arma::mat33 T_camera_tag_;
   arma::mat33 T_robot_camera_;
 
+  /// \brief Subscription callback function of the pick/camera topic
+  /// \param msg The subscribed message object
   void sub_pieces_pos_cam_callback_(const tangram_msgs::msg::TangramPoses::SharedPtr msg);
 
+  /// \brief Subscription callback function of the april/detect topic
+  /// \param msg The subcribed message object
   void sub_apriltag_detect_callback_(const tangram_msgs::msg::Point2D::SharedPtr msg);
 
+  /// \brief Subscription callback function of the april/saved topic
+  /// \param msg The subcribed message object
   void sub_apriltag_saved_callback_(const tangram_msgs::msg::Point2D::SharedPtr msg);
 
+  /// \brief Compute the inverse of the transformation matrix
+  /// \param T The transformation matrix
+  /// \return The inverse of the matrix
   arma::mat33 trans_inv_(const arma::mat33 & T);
 
   void update_transform_();

@@ -1,3 +1,24 @@
+/// \file frame_align.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Align the camera frame with robot frame
+///
+/// PARAMETERS:
+///   \li robot_tag: Transform from robot frame to tag
+///   \li camera_tag: Transform from camera frame to tag
+///
+/// SUBCRIPTIONS:
+///   \li pick/camera: Pick pose in camera frame
+///   \li april/detect: Detected apriltag pose
+///   \li april/saved: Saved apriltag pose
+///
+/// PUBLISHERS:
+///   \li pick/robot: Pick position in the robot frame
+///   \li robot/pose: The pose of the robot's hand
+///
+/// \version 0.1.1
+/// \date 2024-12-11
+///
+/// \copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 

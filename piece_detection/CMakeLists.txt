@@ -83,4 +83,29 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# Building documentation should be optional.
+# To build documentation pass -DBUILD_DOCS=ON when generating the build system
+option(BUILD_DOCS "Build the documentation" OFF)
+
+# build just because Doxygen is missing
+if (BUILD_DOCS)
+  find_package(Doxygen)
+    
+  if (DOXYGEN_FOUND)
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
+
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+
+    add_custom_target(doc_doxygen ALL
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      COMMENT "Generating API documentation with Doxygen"
+      VERBATIM
+    )
+  endif(DOXYGEN_FOUND)
+endif(BUILD_DOCS)
+
 ament_package()

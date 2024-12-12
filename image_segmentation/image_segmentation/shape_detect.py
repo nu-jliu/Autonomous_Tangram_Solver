@@ -61,13 +61,12 @@ class ShapeDetect(Node):
         )
 
     def timer_callback(self):
+        """Timer callback"""
         if self.cv_image is not None:
 
             cv_image = copy.deepcopy(self.cv_image)
             results: list[Results] = self.model.predict(
                 source=cv_image,
-                # stream=True,
-                # classes=[0],
                 verbose=True,
             )
 
@@ -75,15 +74,6 @@ class ShapeDetect(Node):
                 names = result.cpu().names
                 probs = result.cpu().probs
                 boxes = result.cpu().boxes
-                # top1 = probs.top1
-                # top1conf = probs.top1conf
-                # self.get_logger().info(f"{names}")
-                # self.get_logger().info(f"{probs}")
-                # self.get_logger().info(f"{top1}")
-                # self.get_logger().info(f"{top1conf.item()}")
-                # top1 = result.cpu().probs.top1
-                # conf = result.cpu().probs.top1conf.item()
-                # name = names[top1]
 
                 for box in boxes:
                     cls = box.cls.numpy()[0]
@@ -101,31 +91,15 @@ class ShapeDetect(Node):
 
                 classified_image = result.plot()
 
-                # if conf > 0.85:
-                #     h, w, _ = classified_image.shape
-                #     x = int(h / 2)
-                #     y = int(w / 2)
-                #     classified_image = cv2.putText(
-                #         classified_image.copy(),
-                #         name,
-                #         (x, y),
-                #         cv2.FONT_HERSHEY_COMPLEX,
-                #         1,
-                #         (0, 0, 255),
-                #         1,
-                #         cv2.LINE_AA,
-                #     )
-
-                #     msg = PuzzleShape()
-                #     msg.shape = name
-                #     msg.conf = conf
-
-                #     self.pub_puzzle_shape.publish(msg)
-
                 msg_classied = self.bridge.cv2_to_imgmsg(classified_image, "bgr8")
                 self.pub_image_detect.publish(msg_classied)
 
     def sub_image_raw_callback(self, msg: Image):
+        """Subcription callback of the raw image
+
+        :param msg: Raw image message object
+        :type msg: Image
+        """
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         self.color_image = cv_image
         self.cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2BGRA)

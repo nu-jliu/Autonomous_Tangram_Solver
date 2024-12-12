@@ -1,3 +1,22 @@
+/// \file calibrate.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Hand eye calibration node
+///
+/// PARAMETERS:
+///   \li source_frame: The name of the source frame
+///   \li target_frame: The name of the target frame
+///
+/// SERVICES:
+///   \li april/save: Save the current detected apriltag pose
+///
+/// PUBLISHERS:
+///   \li april/detect: The detected apriltag pose
+///   \li april/saved: The saved apriltag pose
+///
+/// \version 0.1.1
+/// \date 2024-12-11
+///
+/// \copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 

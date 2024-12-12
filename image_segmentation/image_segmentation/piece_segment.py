@@ -18,7 +18,6 @@ import cv2
 
 from rcl_interfaces.msg import ParameterDescriptor
 from sensor_msgs.msg import Image
-from realsense2_camera_msgs.msg import Metadata
 
 from std_srvs.srv import Trigger, Trigger_Request, Trigger_Response
 
@@ -113,6 +112,7 @@ class PieceSegment(Node):
         )
 
     def timer_callback(self):
+        """Publish the segmented piece image"""
         if self.cv_image is not None:
             cv_image = self.cv_image.copy()
             self.get_logger().info(f"Shape: {cv_image.shape}")
@@ -164,6 +164,15 @@ class PieceSegment(Node):
             )
 
     def srv_reset_callback(self, request: Trigger_Request, response: Trigger_Response):
+        """Reset the node
+
+        :param request: Request object of the service
+        :type request: Trigger_Request
+        :param response: Response object of the service
+        :type response: Trigger_Response
+        :return: Response object
+        :rtype: Trigger_Response
+        """
         self.get_logger().info("Node resetted")
 
         self.segmented_image = None
@@ -174,6 +183,11 @@ class PieceSegment(Node):
         return response
 
     def sub_image_raw_callback(self, msg: Image):
+        """Subcription callback of the raw image
+
+        :param msg: Subcribed message object
+        :type msg: Image
+        """
         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         cv_image = cv2.flip(cv_image, 0)
 
@@ -187,6 +201,11 @@ class PieceSegment(Node):
 
 
 def main(args=None):
+    """Main function of the node
+
+    :param args: ROS arguments, defaults to None
+    :type args: list[str], optional
+    """
     rclpy.init(args=args)
     node = PieceSegment()
 

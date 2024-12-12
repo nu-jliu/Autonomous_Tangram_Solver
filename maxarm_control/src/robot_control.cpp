@@ -1,3 +1,22 @@
+/// @file robot_control.cpp
+/// @author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// @brief Controls the robot arm
+///
+/// PARAMETERS:
+///   \li servial_device: The name of the serial device port
+///
+/// SERVICES:
+///   \li gripper/grasp: Grasp an object
+///   \li gripper/release: Release an object
+///
+/// ACTIONS:
+///   \li move_arm: Move the arm
+///   \li go_home: Go home
+///
+/// @version 0.1.1
+/// @date 2024-12-11
+///
+/// @copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 

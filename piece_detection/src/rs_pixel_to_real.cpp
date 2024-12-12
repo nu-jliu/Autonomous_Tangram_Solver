@@ -1,3 +1,22 @@
+/// \file rs_pixel_to_real.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Deproject from pixel to real x, y, z
+///
+/// SERVICES:
+///   \li piece/p2r/reset
+///
+/// SUBSCRIPTIONS:
+///   \li /piece/camera/aligned_depth_to_color/image_raw: Raw aligned depth image
+///   \li /piece/camera/aligned_depth_to_color/camera_info: Camera infomation
+///   \li pick/pixel: Pixel coordinate of each tangram piece
+///
+/// PUBLISHERS:
+///   \li pick/camera: pick pose in the camera frame
+///
+/// \version 0.1.1
+/// \date 2024-12-11
+///
+/// \copyright Copyright (c) 2024
 #include <chrono>
 #include <memory>
 

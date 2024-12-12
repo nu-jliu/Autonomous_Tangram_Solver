@@ -1,3 +1,27 @@
+/// \file piece_detection.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Detect the tangram piece
+///
+/// SERVICES:
+///   \li piece/detection/reset: Reset the node
+///
+/// SUBSCRIPTIONS:
+///   \li image/piece/segment: Segmeneted tangram piece image
+///   \li image/piece/mask: Masked tangram piece image
+///
+/// PUBLISHERS:
+///   \li image/piece/erodes: Eroded image
+///   \li image/piece/erodes: Opened image
+///   \li image/piece/erodes: Closed image
+///   \li image/piece/erodes: Image after edge detection
+///   \li image/piece/erodes: Raw contours
+///   \li image/piece/erodes: Labeled contours
+///   \li pick/pixel: Pick position in pixel
+///
+/// \version 0.1.1
+/// \date 2024-12-11
+///
+/// \copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 
@@ -146,17 +170,6 @@ void PieceDetection::timer_callback_()
         );
         cv::polylines(img_labeled, approx_contour, true, color);
 
-        // const cv::Moments m = cv::moments(approx_contour);
-
-        // if (m.m00 != 0) {
-        //   const int cx = static_cast<int>(m.m10 / m.m00);
-        //   const int cy = static_cast<int>(m.m01 / m.m00);
-
-        //   const cv::Point center(cx, cy);
-        //   const cv::Point center_up(cx - 50, cy);
-        //   const cv::Point center_down(cx - 50, cy + 15);
-        //   const cv::Point center_lower(cx - 50, cy + 30);
-
         const cv::Point center = tangram_utils::find_center(approx_contour);
 
         const int cx = center.x;
@@ -170,14 +183,6 @@ void PieceDetection::timer_callback_()
         piece.location.x = cx;
         piece.location.y = row_size - cy;
 
-        // for (const cv::Point & p : approx_contour) {
-        //   tangram_msgs::msg::Point2DInt point;
-        //   point.x = p.x;
-        //   point.y = p.y;
-
-        //   piece.contour.push_back(point);
-        // }
-
         piece.theta = radian;
         piece.type = static_cast<int32_t>(type);
 
@@ -188,13 +193,8 @@ void PieceDetection::timer_callback_()
           piece.flipped = false;
         }
 
-        // UUIDv4::UUID uuid = uuid_generator_.getUUID();
-
-        // std::stringstream ss_uuid("");
-        // ss_uuid << uuid;
         const boost::uuids::uuid uuid = uuid_genorator_();
         piece.uuid = boost::uuids::to_string(uuid);
-        // piece.uuid = uuid.bytes();
 
         pieces_msg.pieces.push_back(piece);
 
@@ -322,9 +322,6 @@ void PieceDetection::sub_image_segment_callback_(const sensor_msgs::msg::Image::
   );
   image_segment_ = cv_image_ptr->image;
 
-  // image_segment_raw = cv_image_ptr->image;
-  // cv::resize(image_segment_raw, image_segment_, target_size_, 0.0, 0.0, cv::INTER_AREA);
-
   if (!segment_ready_) {
     segment_ready_ = true;
   }
@@ -342,10 +339,6 @@ void PieceDetection::sub_image_mask_callback_(const sensor_msgs::msg::Image::Sha
 
   image_mask_ = cv_image_ptr->image;
 
-  // image_mask_raw = cv_image_ptr->image;
-  // cv::resize(image_mask_raw, image_mask_resized, target_size_, 0.0, 0.0, cv::INTER_NEAREST);
-  // cv::threshold(image_mask_resized, image_mask_, 127, 255, cv::THRESH_BINARY);
-
   if (!mask_ready_) {
     mask_ready_ = true;
   }
@@ -358,9 +351,6 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   auto node = std::make_shared<piece_detection::PieceDetection>();
   rclcpp::spin(node);
-  // auto executor = std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
-  // executor->add_node(node);
-  // executor->spin();
   rclcpp::shutdown();
   return 0;
 }

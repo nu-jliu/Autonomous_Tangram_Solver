@@ -2,7 +2,7 @@
 #define PIECE_DETECTION__PIECE_DETECTION_HPP___
 
 #include <opencv2/opencv.hpp>
-// #include "uuid_v4/uuid_v4.h"
+
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -19,6 +19,7 @@ namespace piece_detection
 class PieceDetection : public rclcpp::Node
 {
 public:
+  /// \brief Construct the piece_detection node
   PieceDetection();
 
 private:
@@ -39,7 +40,6 @@ private:
   rclcpp::Publisher<tangram_msgs::msg::TangramPieces>::SharedPtr pub_piece_pixels_;
 
   boost::uuids::random_generator_mt19937 uuid_genorator_;
-  // UUIDv4::UUIDGenerator<std::mt19937_64> uuid_generator_;
 
   bool segment_ready_;
   bool mask_ready_;
@@ -49,15 +49,23 @@ private:
   cv::Mat image_segment_;
   cv::Mat image_mask_;
 
+  /// \brief Timer callback function
   void timer_callback_();
 
+  /// \brief Reset service callback
+  /// \param request Request object of the service
+  /// \param response Response object of the service
   void srv_reset_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response
   );
 
+  /// \brief Subcription callback of the segmented image
+  /// \param msg Subcribed image message object
   void sub_image_segment_callback_(const sensor_msgs::msg::Image::SharedPtr msg);
 
+  /// \brief Subcription callback of the masked image
+  /// \param msg Subcribed image message object
   void sub_image_mask_callback_(const sensor_msgs::msg::Image::SharedPtr msg);
 };
 }  // namespace piece_detection

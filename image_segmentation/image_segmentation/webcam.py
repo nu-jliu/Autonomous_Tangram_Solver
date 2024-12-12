@@ -91,6 +91,7 @@ class WebCamera(Node):
         # return device_info
 
     def timer_callback(self):
+        """Timer callback"""
         try:
             ret, image = self.cap.read()
 
@@ -103,6 +104,11 @@ class WebCamera(Node):
 
 
 def main(args=None):
+    """Main function of the node
+
+    :param args: ROS arguments, defaults to None
+    :type args: list[str], optional
+    """
     rclpy.init(args=args)
     node = WebCamera()
 
