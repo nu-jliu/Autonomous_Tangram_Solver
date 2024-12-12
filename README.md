@@ -97,13 +97,38 @@ rosdep install --from-paths src --ignore-src -r -y --skip-keys boost --skip-keys
 
 Build
 
+
 ```bash
 cd ${WORKSPACE}
 colcon clean workspace -y
 colcon build --symlink-install --event-handlers console_direct+
 ```
 
-## Packages
+
+ ## Launch the Program
+To launch the entire software run the following command in a terminal
+
+```bash
+cd ${WORKSPACE}
+source install/setup.bash
+ros2 launch tangram_bot tangram.launch.py
+```
+
+Then the program will start by self-calibration. After you see robot arm moving out of the camera frame, you shall place the target tangram puzzle shape in the front of the camera, then run the following command, the robot will solve the puzzle automatically. 
+
+```bash
+ros2 action send_goal /action/execute tangram_msgs/action/ExecuteAction {} -f
+```
+
+## Software Architecture
+
+The entire software architecture for the project is shown in the figure below, this diagram shows data is transmitted between ROS nodes.
+
+![](media/rosgraph.png)
+
+### Packages
+
+<!-- This software consists of 8 packages, which is described below:
 
  - `hand_eye_calibration`: Performs the hand-eye calibration steps for getting the positional relationship between the camera frame and the robot frame.
  - `image_segmentation`: Runs all vision models for this project to segment images using trained model.
@@ -112,4 +137,16 @@ colcon build --symlink-install --event-handlers console_direct+
  - `puzzle_solver`: Solving the tangram puzzle, generating the goal pose for each tangram pieces.
  - `tangram_bot`: Generate robot actions and execute the actions to pick and place tangram pieces to solve the puzzle.
  - `tangram_msgs`: All custom interfaces used for IPC (Inter-Process Communication)
- - `tangram_utils`: All library functions for
+ - `tangram_utils`: All library functions for tangram geometric calculations. -->
+
+ The software developed for this project is composed of 8 interconnected packages, each performing a specific function to enable the robotic system to solve tangram puzzles. The packages are described as follows:
+
+- **`hand_eye_calibration`**: Implements the steps for hand-eye calibration to determine the positional relationship between the camera frame and the robot frame.
+- **`image_segmentation`**: Executes all vision models used in this project to segment images based on a trained model.
+- **`maxarm_control`**: Handles low-level position control of the robot arm, ensuring precise movements.
+- **`piece_detection`**: Detects the pose (position and orientation) of all tangram pieces required for solving the puzzle.
+- **`puzzle_solver`**: Generates the goal pose for each tangram piece to solve the puzzle.
+- **`tangram_bot`**: Generates and executes robot actions to pick up and place tangram pieces, completing the puzzle assembly.
+- **`tangram_msgs`**: Contains all custom interfaces for **Inter-Process Communication (IPC)** between different system components.
+- **`tangram_utils`**: Provides library functions for tangram geometric calculations, supporting operations like pose transformations and shape analysis.
+
