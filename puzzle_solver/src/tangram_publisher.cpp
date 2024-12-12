@@ -1,3 +1,18 @@
+/// \file tangram_publisher.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Publish the tangram
+///
+/// PARAMETERS:
+///   \li image_dir: Directory of the image
+///   \li image_name: The filename of the image
+///
+/// PUBLISHERS:
+///   \li tangram/image/inferenced: The inferenced image
+///
+/// \version 0.1.1
+/// \date 2024-12-12
+///
+/// \copyright Copyright (c) 2024
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include <memory>
@@ -34,9 +49,13 @@ TangramPublisher::TangramPublisher()
   image_full_path_ = full_path.string();
 
   timer_ = create_wall_timer(
-    0.01s, std::bind(
-      &TangramPublisher
-      ::timer_callback_, this));
+    0.01s,
+    std::bind(
+      &TangramPublisher::timer_callback_,
+      this
+    )
+  );
+
   pub_image_inferenced_ = create_publisher<sensor_msgs::msg::Image>("tangram/image/inferenced", 10);
 }
 

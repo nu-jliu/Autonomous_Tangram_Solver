@@ -1,3 +1,21 @@
+/// @file svg_generator.cpp
+/// @author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// @brief Generare the svg file for lacer cutting
+///
+/// PARAMETERS:
+///   \li svg_dir: The directory for the svg file
+///   \li svg_name: The name of the svg file
+///
+/// SUBCRIPTIONS:
+///   \li place/pixel: Placed position in pixel
+///
+/// SERVICES:
+///   \li generate_svg: Generate the svg file for placing.
+///
+/// @version 0.1.1
+/// @date 2024-12-12
+///
+/// @copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 #include <iostream>
@@ -31,6 +49,26 @@ SVGGenerator::SVGGenerator()
   const boost::filesystem::path full_path = directory / filename;
 
   svg_file_path_ = full_path.string();
+
+  srv_generate_svg_ = create_service<std_srvs::srv::Trigger>(
+    "generate_svg",
+    std::bind(
+      &SVGGenerator::srv_generate_svg_callback_,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2
+    )
+  );
+
+  sub_puzzle_pixel_ = create_subscription<tangram_msgs::msg::TangramPieces>(
+    "place/pixel",
+    10,
+    std::bind(
+      &SVGGenerator::sub_puzzle_pixel_callback_,
+      this,
+      std::placeholders::_1
+    )
+  );
 }
 
 void SVGGenerator::sub_puzzle_pixel_callback_(const tangram_msgs::msg::TangramPieces::SharedPtr msg)

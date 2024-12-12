@@ -20,7 +20,10 @@ namespace maxarm_control
 class RobotControl : public rclcpp::Node
 {
 public:
+  /// \brief The constructor of the maxarm_control node
   RobotControl();
+
+  /// \brief The destructor of the maxarm_control node
   virtual ~RobotControl();
 
 private:
@@ -151,5 +154,5 @@ private:
   /// \brief Turn off the nozzle
   void nozzle_off_();
 };
-}  // namespace maxarm_control
-#endif  // MAXARM_CONTROL__ROBOT_CONTROL_HPP___
+}  /// namespace maxarm_control
+#endif  /// MAXARM_CONTROL__ROBOT_CONTROL_HPP___

@@ -12,6 +12,7 @@ namespace puzzle_solver
 class SVGGenerator : public rclcpp::Node
 {
 public:
+  /// \brief Constructor of the svg_generator node
   SVGGenerator();
 
 private:
@@ -35,5 +36,5 @@ private:
     std_srvs::srv::Trigger::Response::SharedPtr response
   );
 };
-}  // namespace puzzle_solver
-#endif  // PUZZLE_SOLVER__SVG_GENERATOR_HPP___
+}  /// namespace puzzle_solver
+#endif  /// PUZZLE_SOLVER__SVG_GENERATOR_HPP___

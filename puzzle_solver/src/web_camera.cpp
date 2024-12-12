@@ -1,3 +1,17 @@
+/// \file web_camera.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Publish the web camera image
+///
+/// PARAMETER:
+///   \li camera_name: The name of the camera device
+///
+/// PUBLISHERS:
+///   \li puzzle/camera/color/image_raw: The image of the puzzle camera
+///
+/// \version 0.1.1
+/// \date 2024-12-12
+///
+/// \copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 #include <regex>
@@ -68,13 +82,6 @@ WebCamera::WebCamera()
           }
         }
       }
-
-      // std::regex card_type_regex("Card type:\\s*(.+)");
-      // std::smatch match;
-      // if (std::regex_search(result, match, card_type_regex)) {
-      //   std::string name = match[1];
-      //   device_info.emplace_back(device, name);
-      // }
     } catch (const std::exception & e) {
       RCLCPP_ERROR_STREAM(get_logger(), "Failed to get info for " << device << ": " << e.what());
     }

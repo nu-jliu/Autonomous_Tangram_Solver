@@ -64,5 +64,5 @@ private:
 
   void update_transform_();
 };
-}  // namespace maxarm_control
-#endif  // MAXARM_CONTROL__FRAME_ALIGN_HPP___
+}  /// namespace maxarm_control
+#endif  /// MAXARM_CONTROL__FRAME_ALIGN_HPP___

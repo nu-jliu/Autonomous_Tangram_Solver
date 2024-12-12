@@ -19,6 +19,7 @@ namespace puzzle_solver
 class PuzzleSolver : public rclcpp::Node
 {
 public:
+  /// \brief Constructor of the puzzle_solver node
   PuzzleSolver();
 
 private:
@@ -46,20 +47,19 @@ private:
   cv::Mat source_img_;
   cv::Mat target_img_;
 
-  /// \brief
+  /// \brief Timer callback function
   void timer_callback_();
 
-  /// \brief
-  /// \param request
-  /// \param response
+  /// \brief Reset the node
+  /// \param request Request object of the service
+  /// \param response Response object of the service
   void srv_reset_callback_(
     const std_srvs::srv::Trigger::Request::SharedPtr request,
     std_srvs::srv::Trigger::Response::SharedPtr response
   );
 
-  /// \brief
-  /// \param request
-  /// \param response
+  /// \brief Subsciption callback of the interences tangram image
+  /// \param msg The subscribed inferenced image object
   void sub_tangram_image_inferenced_callback_(sensor_msgs::msg::Image::SharedPtr msg);
 };
 }  // namespace puzzle_solver

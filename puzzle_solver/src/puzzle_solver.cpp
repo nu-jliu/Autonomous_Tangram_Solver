@@ -1,3 +1,28 @@
+/// @file puzzle_solver.cpp
+/// @author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// @brief Solve the puzzle
+///
+/// SERVICES:
+///   \li puzzle/solver/reset: Reset the node
+///
+/// SUBSCRIPTIONS:
+///   \li image/inferenced: Inferenced image
+///
+/// PUBLISHERS:
+///   \li puzzle/image/source: Source image
+///   \li puzzle/image/dilate: Dilated image
+///   \li puzzle/image/erode: Eroded image
+///   \li puzzle/image/opened: Opened image
+///   \li puzzle/image/closed: Closed image
+///   \li puzzle/image/edges: Image of all detected edges
+///   \li puzzle/image/contours/raw: Image of all raw contours
+///   \li puzzle/image/contours/labeled: Image of labeled contours
+///   \li place/pixel: The placed position in pixel
+///
+/// @version 0.1.1
+/// @date 2024-12-12
+///
+/// @copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 
@@ -8,7 +33,6 @@
 #include <std_msgs/msg/header.hpp>
 
 #include "puzzle_solver/puzzle_solver.hpp"
-// #include "puzzle_solver/tangram_match.hpp"
 #include "tangram_utils/tangram_match.hpp"
 #include "tangram_msgs/msg/tangram_piece.hpp"
 
@@ -169,14 +193,6 @@ void PuzzleSolver::timer_callback_()
         );
         cv::polylines(contours_labeled, approx_contour, true, color);
 
-        // const cv::Moments m = cv::moments(approx_contour);
-
-
-        // if (m.m00 != 0) {
-        // const int cx = static_cast<int>(m.m10 / m.m00);
-        // const int cy = static_cast<int>(m.m01 / m.m00);
-
-        // const cv::Point center(cx, cy);
         const cv::Point center = tangram_utils::find_center(approx_contour);
         const int cx = center.x;
         const int cy = center.y;

@@ -19,7 +19,10 @@ namespace puzzle_solver
 class WebCamera : public rclcpp::Node
 {
 public:
+  /// \brief The constructor of the web_camera node
   WebCamera();
+
+  /// \brief The destructor of the web_camera node
   virtual ~WebCamera();
 
 private:

@@ -1,3 +1,21 @@
+/// \file solution_pixel_to_real.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Map solution from pixel space to real space
+///
+/// PARAMETERS:
+///   \li scale: Scale of the tangram from pixel to real
+///   \li offset: The offset that the tangram puzzle to place
+///
+/// SUBSCRIPTIONS:
+///   \li place/pixel: Subscribed pixel coordiante tangram position to place
+///
+/// PUBLISHERS:
+///   \li place/robot: The placed robot coordinate
+///
+/// \version 0.1.1
+/// \date 2024-12-12
+///
+/// \copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 
