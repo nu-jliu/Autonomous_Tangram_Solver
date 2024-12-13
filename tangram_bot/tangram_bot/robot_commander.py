@@ -7,8 +7,6 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from tangram_msgs.action import MoveArm, GoHome
 from std_srvs.srv import Trigger
 
-import random
-
 
 class RobotCommander:
 
@@ -20,7 +18,6 @@ class RobotCommander:
         self.y = 0.0
         self.z = 0.0
 
-        # self.node = rclpy.create_node(f"robot_commander_{random.randint(0, 255)}")
         self.node = node
         self.callback_group = ReentrantCallbackGroup()
 
@@ -60,11 +57,20 @@ class RobotCommander:
                 f"Action server {self.cli_action_go_home._action_name} not available, waiting again"
             )
 
-    # def __del__(self):
-    #     self.node.destroy_node()
-    #     rclpy.try_shutdown()
-
     async def move_arm(self, x: float, y: float, z: float, pick: bool = False):
+        """Move the arm to X, Y, Z
+
+        :param x: X position
+        :type x: float
+        :param y: Y position
+        :type y: float
+        :param z: Z position
+        :type z: float
+        :param pick: Whether to pick, defaults to False
+        :type pick: bool, optional
+        :return: Result object
+        :rtype: MoveArm_Result
+        """
         self.node.get_logger().info(
             f"Sending request for robot arm to move to {x, y, z}"
         )
@@ -82,11 +88,9 @@ class RobotCommander:
 
         future = self.cli_action_move_arm.send_goal_async(goal)
         await future
-        # rclpy.spin_until_future_complete(self.node, future)
 
         future = future.result().get_result_async()
         await future
-        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()
 
@@ -97,6 +101,19 @@ class RobotCommander:
         z_diff: float,
         pick: bool = False,
     ):
+        """Move by a offset
+
+        :param x_diff: X difference
+        :type x_diff: float
+        :param y_diff: Y difference
+        :type y_diff: float
+        :param z_diff: Z difference
+        :type z_diff: float
+        :param pick: Whether to pick, defaults to False
+        :type pick: bool, optional
+        :return: Result object
+        :rtype: MoveArm_Result
+        """
         goal_x = self.x + x_diff
         goal_y = self.y + y_diff
         goal_z = self.z + z_diff
@@ -105,6 +122,11 @@ class RobotCommander:
         return result
 
     async def go_home(self):
+        """Go home
+
+        :return: Result object
+        :rtype: GoHome_Result
+        """
         self.node.get_logger().info("Sending request to home robot arm")
 
         future: Future = None
@@ -112,15 +134,18 @@ class RobotCommander:
 
         future = self.cli_action_go_home.send_goal_async(goal)
         await future
-        # rclpy.spin_until_future_complete(self.node, future)
 
         future = future.result().get_result_async()
         await future
-        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()
 
     async def grasp(self):
+        """Grasp an object
+
+        :return: response object
+        :rtype: Trigger_Response
+        """
         self.node.get_logger().info(f"Sending request to grasp")
 
         future: Future = None
@@ -128,11 +153,15 @@ class RobotCommander:
 
         future = self.cli_grasp.call_async(request)
         await future
-        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()
 
     async def release(self):
+        """Release an object
+
+        :return: Result object
+        :rtype: Trigger_Response
+        """
         self.node.get_logger().info("Sending request to release")
 
         future: Future = None
@@ -140,6 +169,5 @@ class RobotCommander:
 
         future = self.cli_release.call_async(request)
         await future
-        # rclpy.spin_until_future_complete(self.node, future)
 
         return future.result()

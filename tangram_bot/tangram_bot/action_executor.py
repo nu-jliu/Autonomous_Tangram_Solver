@@ -505,6 +505,11 @@ class ActionExecutor(Node):
 
 
 def main(args=None):
+    """Main function of the node
+
+    :param args: ROS args, defaults to None
+    :type args: list[str], optional
+    """
     rclpy.init(args=args)
     node = ActionExecutor()
 

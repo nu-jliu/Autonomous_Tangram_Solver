@@ -7,6 +7,13 @@ import copy
 
 
 def validate_poses(poses: list[TangramPose]):
+    """Validate the poses
+
+    :param poses: list of poses
+    :type poses: list[TangramPose]
+    :return: Whether the poses is valid
+    :rtype: bool
+    """
     if len(poses) != 7:
         return False
 
@@ -80,6 +87,7 @@ class ActionGenerator(Node):
         self.pub_action = self.create_publisher(RobotAction, "robot/action", 10)
 
     def timer_callback(self):
+        """Publish the robot action"""
         if self.robot_action is not None:
             self.pub_action.publish(self.robot_action)
 
@@ -111,13 +119,6 @@ class ActionGenerator(Node):
 
                             break
 
-                # actions = [
-                #     (pick, place)
-                #     for pick in pick_poses
-                #     for place in place_poses
-                #     if pick.type == place.type
-                # ]
-
                 action_msg = RobotAction()
                 action_msg.header.stamp = self.get_clock().now().to_msg()
 
@@ -136,16 +137,30 @@ class ActionGenerator(Node):
                     action_msg.actions.append(pick_place)
 
                 self.robot_action = action_msg
-                # self.pub_action.publish(action_msg)
 
     def sub_pick_poses_callback(self, msg: TangramPoses):
+        """Subscription callback of pick poses
+
+        :param msg: _description_
+        :type msg: TangramPoses
+        """
         self.pick_poses = msg
 
     def sub_place_poses_callback(self, msg: TangramPoses):
+        """Subcription callback of all place poses
+
+        :param msg: Place poses object
+        :type msg: TangramPoses
+        """
         self.place_poses = msg
 
 
 def main(args=None):
+    """Main function of the node
+
+    :param args: ROS args, defaults to None
+    :type args: list[str], optional
+    """
     rclpy.init(args=args)
     node = ActionGenerator()
 
