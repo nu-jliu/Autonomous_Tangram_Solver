@@ -1,6 +1,6 @@
-/// @file svg_generator.cpp
-/// @author Allen Liu (jingkunliu2025@u.northwestern.edu)
-/// @brief Generare the svg file for lacer cutting
+/// \file svg_generator.cpp
+/// \author Allen Liu (jingkunliu2025@u.northwestern.edu)
+/// \brief Generare the svg file for lacer cutting
 ///
 /// PARAMETERS:
 ///   \li svg_dir: The directory for the svg file
@@ -12,10 +12,10 @@
 /// SERVICES:
 ///   \li generate_svg: Generate the svg file for placing.
 ///
-/// @version 0.1.1
-/// @date 2024-12-12
+/// \version 0.1.1
+/// \date 2024-12-12
 ///
-/// @copyright Copyright (c) 2024
+/// \copyright Copyright (c) 2024
 #include <memory>
 #include <chrono>
 #include <iostream>

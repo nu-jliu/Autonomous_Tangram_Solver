@@ -21,6 +21,13 @@ import time
 
 
 def get_shape_name(index):
+    """Get the name for each tangram shape
+
+    :param index: Index of the tangram piece
+    :type index: int
+    :return: Name of the tangram piece
+    :rtype: str
+    """
     shapes = [
         "Small Triangle",
         "Medium Triangle",
@@ -46,9 +53,6 @@ class ActionExecutor(Node):
 
         self.robot_x = 0.0
         self.robot_y = 0.0
-
-        # self.z_standoff = 0.12
-        # self.z_down = 0.06
 
         self.declare_parameter(
             "pick.standoff",
@@ -180,6 +184,11 @@ class ActionExecutor(Node):
             )
 
     def sub_robot_pose_callback(self, msg: Point2D):
+        """Subcription callback of the robot pose
+
+        :param msg: Robot pose object
+        :type msg: Point2D
+        """
         self.robot_x = msg.x
         self.robot_y = msg.y
 
@@ -200,6 +209,15 @@ class ActionExecutor(Node):
         request: Trigger_Request,
         response: Trigger_Response,
     ):
+        """Reset the node
+
+        :param request: Request object for reset service
+        :type request: Trigger_Request
+        :param response: Response object for the reset service
+        :type response: Trigger_Response
+        :return: Response object of the service
+        :rtype: Trigger_Response
+        """
         self.get_logger().info("Resetting the system")
 
         future: Future = None
@@ -224,12 +242,28 @@ class ActionExecutor(Node):
         return response
 
     def srv_ready_callback(self, request: Trigger_Request, response: Trigger_Response):
+        """Set the calibration to ready
+
+        :param request: Request object of the ready service
+        :type request: Trigger_Request
+        :param response: Response object of the readu service
+        :type response: Trigger_Response
+        :return: Response object
+        :rtype: Trigger_Response
+        """
         self.calibration_ready = True
 
         response.success = True
         return response
 
     def action_execute_action_goal_callback(self, request):
+        """Goal handle of the action server
+
+        :param request: Goal request object of the action
+        :type request: RobotAction_Goal
+        :return: Goal response object
+        :rtype: GoalResponse
+        """
         self.get_logger().info(f"Received goal request: {request}")
 
         if self.in_motion:
@@ -242,6 +276,13 @@ class ActionExecutor(Node):
             return GoalResponse.ACCEPT
 
     def action_execute_action_cancel_callback(self, request):
+        """Cancel the action
+
+        :param request: Request object of the action
+        :type request: RobotAction_Goal
+        :return: Cancel response object
+        :rtype: CancelResponse
+        """
         self.get_logger().info(f"Received cancel request: {request}")
 
         if self.cancel_requested:
@@ -252,8 +293,16 @@ class ActionExecutor(Node):
             return CancelResponse.ACCEPT
 
     async def action_execute_action_execute_callback(
-        self, goal_handle: ServerGoalHandle
+        self,
+        goal_handle: ServerGoalHandle,
     ):
+        """Execute the robot action
+
+        :param goal_handle: Goal handle object of the server
+        :type goal_handle: ServerGoalHandle
+        :return: Success result object
+        :rtype: RobotAction_Result
+        """
         if self.robot_action is None:
             speech = Speech("Action not received yet, please wait", "en")
             speech.play()
@@ -286,7 +335,6 @@ class ActionExecutor(Node):
 
             if action.shape == PickPlace.LARGE_TRIANGLE:
                 pick_x += 0.01
-            # motion = 1
 
             shape_name = get_shape_name(action.shape)
             speech = Speech(f"Picking {shape_name}", "en")
@@ -296,12 +344,7 @@ class ActionExecutor(Node):
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            # pick_x, pick_y = await self.move_to(
-            #     pick_x,
-            #     pick_y,
-            #     self.pick_standoff,
-            #     pick=True,
-            # )
+
             await self.commander.move_arm(
                 pick_x,
                 pick_y,
@@ -309,26 +352,19 @@ class ActionExecutor(Node):
                 pick=True,
             )
             self.publish_status(f"Stage {stage} --> Pick standoff", goal_handle)
-            # motion += 1
 
-            # time.sleep(0.5)
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
             await self.commander.grasp()
             self.publish_status(f"Stage {stage} --> Grasp", goal_handle)
-            # motion += 1
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
             await self.commander.move_arm(pick_x, pick_y, self.pick_object, pick=True)
             self.publish_status(f"Stage {stage} --> Pick object", goal_handle)
-            # motion += 1
-
-            # time.sleep(0.5)
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
-            # await self.move_to(pick_x, pick_y, self.pick_standoff, pick=True)
             await self.commander.move_arm(
                 pick_x,
                 pick_y,
@@ -336,17 +372,7 @@ class ActionExecutor(Node):
                 pick=True,
             )
             self.publish_status(f"Stage {stage} --> Pick standoff", goal_handle)
-            # motion += 1
 
-            # time.sleep(0.5)
-
-            # if self.cancel_requested:
-            #     return self.get_cancel_result(goal_handle)
-            # self.publish_status(f"Stage {stage} --> Motion {motion}", goal_handle)
-            # # motion += 1
-            # self.commander.go_home()
-
-            # time.sleep(0.5)
             speech = Speech(f"Placing {shape_name}", "en")
             speech.play()
 
@@ -356,9 +382,6 @@ class ActionExecutor(Node):
                 place_x, place_y, self.place_standoff, pick=False
             )
             self.publish_status(f"Stage {stage} --> Place standoff", goal_handle)
-            # motion += 1
-
-            # time.sleep(0.5)
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
@@ -369,14 +392,11 @@ class ActionExecutor(Node):
                 pick=False,
             )
             self.publish_status(f"Stage {stage} --> Place object", goal_handle)
-            # motion += 1
 
-            # time.sleep(0.5)
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
             await self.commander.release()
             self.publish_status(f"Stage {stage} --> Release", goal_handle)
-            # motion += 1
 
             if self.cancel_requested:
                 return self.get_cancel_result(goal_handle)
@@ -384,15 +404,11 @@ class ActionExecutor(Node):
                 place_x, place_y, self.place_standoff, pick=False
             )
             self.publish_status(f"Stage {stage} --> Place object", goal_handle)
-            # motion += 1
-
-            # stage += 1
 
         if self.cancel_requested:
             return self.get_cancel_result(goal_handle)
         await self.commander.go_home()
         self.publish_status("Final --> Going home", goal_handle)
-        # motion += 1
 
         speech = Speech("Finished solving puzzle", "en")
         speech.play()
@@ -446,9 +462,9 @@ class ActionExecutor(Node):
     def publish_status(self, status: str, goal_handle: ServerGoalHandle):
         """Publish the status of the server
 
-        :param status: _description_
+        :param status: The status
         :type status: str
-        :param goal_handle: _description_
+        :param goal_handle: Goal handle object
         :type goal_handle: ServerGoalHandle
         """
         self.status = status
@@ -463,6 +479,19 @@ class ActionExecutor(Node):
         goal_handle.publish_feedback(feedback)
 
     async def move_to(self, x: float, y: float, z: float, pick: bool = False):
+        """Move to a position
+
+        :param x: X position
+        :type x: float
+        :param y: Y position
+        :type y: float
+        :param z: Z position
+        :type z: float
+        :param pick: Whether the moved position is pick, defaults to False
+        :type pick: bool, optional
+        :return: Actual x, y coordinate
+        :rtype: tuple[int, int]
+        """
         await self.commander.move_arm(x, y, z, pick)
 
         time.sleep(0.2)
